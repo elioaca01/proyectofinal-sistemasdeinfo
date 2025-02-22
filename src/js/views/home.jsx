@@ -2,29 +2,29 @@ import React from "react";
 import "../../styles/home.css";
 
 export const Home = () => {
-	return(
-		<div className="container-fluid">
-				<section className="position-relative" style="height: 50vh;">
-					<img alt="Imagen de montañas" className="w-100 h-100 object-cover" src="imagenes/header.jpg"/>
-					<div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white bg-dark bg-opacity-50">
-						
-						<div className="d-flex flex-column flex-md-row justify-content-between w-100 px-4">
-							
-							<h1 className="display-5 fw-bold text-center text-md-start col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green">VIVE LA AVENTURA</h1>
-							
-							<p className="lead mt-2 text-justify text-md-end col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green" style="max-width: 30%;">Viva los detalles de las mejores caminatas, vistas y lugares secretos del parque nacional Ávila.</p>
-						</div>
-						
-						<input className="mt-4 px-4 py-2 rounded-lg bg-custom-green text-white" placeholder="Buscar por..." type="text" style="width: 20%;"/>
-					</div>
-				</section>
+	return (
+		<div className="principal w-100">
+			<section className="position-relative">
+				<img alt="Imagen de montañas" className="w-100 h-100 object-cover" src='https://res.cloudinary.com/dntc8trob/image/upload/v1740262967/imagen-header_xgih0d.jpg' />
+				<div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white bg-dark bg-opacity-50">
 
-			
+					<div className="d-flex flex-column flex-md-row justify-content-between w-100 px-4">
+
+						<h1 className="display-5 fw-bold text-center text-md-start col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green">VIVE LA AVENTURA</h1>
+
+						<p className="lead mt-2 text-justify text-md-end col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green">Viva los detalles de las mejores caminatas, vistas y lugares secretos del parque nacional Ávila.</p>
+					</div>
+
+					<input className="mt-4 px-4 py-2 rounded-lg bg-custom-green text-white" placeholder="Buscar por..." type="text" />
+				</div>
+			</section>
+
+
 			<section className="py-5 bg-custom-yellow">
 				<div className="container">
 					<div className="row align-items-center">
 						<div className="col-md-4 text-center">
-							<img alt="Logo de Avilamet" className="img-fluid" src="imagenes/avilamet-removebg-preview.png"/>
+							<img alt="Logo de Avilamet" className="img-fluid" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png" />
 						</div>
 						<div className="col-md-8">
 							<div className="mb-5">
@@ -44,35 +44,35 @@ export const Home = () => {
 				</div>
 			</section>
 
-			
+
 			<section className="py-5 bg-custom-green text-white">
 				<div className="container text-center">
 					<h2 className="display-5 fw-bold mb-5">DESCUBRE LAS MEJORES RUTAS</h2>
 					<div className="row g-4 ">
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de Sabas Nieves" className="w-100 h-70 object-cover rounded" src="imagenes/sabasnieves.jpeg"/>
+								<img alt="Imagen de Sabas Nieves" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263845/WhatsApp_Image_2025-02-22_at_5.51.47_PM_ouyvmq.jpg" />
 								<h3 className="mt-4 h4 fw-bold text-custom-green">Sabas Nieves</h3>
 								<p className="mt-2 text-custom-green">Ruta fácil - 1.5 km - 1 hora</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de Lagunazo" className="w-100 h-70 object-cover rounded" src="imagenes/lagunazo.jpeg"/>
+								<img alt="Imagen de Lagunazo" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263972/imagen2_kcfy9a.jpg" />
 								<h3 className="mt-4 h4 fw-bold text-custom-green">Lagunazo</h3>
 								<p className="mt-2 text-custom-green">Ruta moderada - 6.4 km - 4 horas</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de El Banquito" className="w-100 h-70 object-cover rounded" src="imagenes/elbanquito.jpg"/>
+								<img alt="Imagen de El Banquito" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263703/imagen1_hj9bx0.jpg" />
 								<h3 className="mt-4 h4 fw-bold text-custom-green">El Banquito</h3>
 								<p className="mt-2 text-custom-green">Ruta difícil - 16.8 km - 8 horas</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de Pico Naiguatá" className="w-100 h-70 object-cover rounded" src="imagenes/piconaiguata.jpg"/>
+								<img alt="Imagen de Pico Naiguatá" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263980/imagen3_gj2ztl.jpg" />
 								<h3 className="mt-4 h4 fw-bold text-custom-green">Pico Naiguatá</h3>
 								<p className="mt-2 text-custom-green">Ruta extrema - 15 km - 12 horas</p>
 							</div>
@@ -81,12 +81,12 @@ export const Home = () => {
 				</div>
 			</section>
 
-			
+
 			<section className="py-5 bg-custom-yellow">
 				<div className="container">
 					<div className="row align-items-center bg-custom-green text-white p-4 rounded-lg">
 						<div className="col-md-4 text-center">
-							<img alt="Imagen de descuento" className="img-fluid rounded-lg" src="imagenes/descuento.jpg"/>
+							<img alt="Imagen de descuento" className="img-fluid rounded-lg" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264083/WhatsApp_Image_2025-02-22_at_5.51.47_PM_1_sh9dum.jpg" />
 						</div>
 						<div className="col-md-8">
 							<h2 className="display-5 fw-bold text-center">20% DESCUENTO</h2>
@@ -98,7 +98,7 @@ export const Home = () => {
 				</div>
 			</section>
 
-		
+
 			<section className="py-5 bg-custom-yellow">
 				<div className="container">
 					<h2 className="display-5 fw-bold text-custom-green mb-4">Comparte tu aventura</h2>
@@ -108,28 +108,28 @@ export const Home = () => {
 					<div className="row g-4 bg-custom-green p-4 rounded-lg">
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte1" className="w-100 h-70 object-cover rounded" src="imagenes/"/>
-								
+								<img alt="Imagen de comparte1" className="w-100 h-70 object-cover rounded" src="imagenes/" />
+
 								<p className="mt-2 text-custom-green">@DanielFuentes</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte2" className="w-100 h-70 object-cover rounded" src="imagenes/fotode-comparte tu aventura2.jpg"/>
-								
+								<img alt="Imagen de comparte2" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264151/WhatsApp_Image_2025-02-22_at_5.51.47_PM_2_c6asdo.jpg" />
+
 								<p className="mt-2 text-custom-green">@AngelicaB</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte3" className="w-100 h-70 object-cover rounded" src="imagenes/fotode-comparte tu aventura3.jpeg"/>
-								
+								<img alt="Imagen de comparte3" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264366/WhatsApp_Image_2025-02-22_at_5.51.47_PM_4_lvvfmf.jpg" />
+
 								<p className="mt-2 text-custom-green">@Andrea_Diaz</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte4" className="w-100 h-70 object-cover rounded" src="imagenes/fotode-comparte tu aventura4.jpg"/>
+								<img alt="Imagen de comparte4" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264227/WhatsApp_Image_2025-02-22_at_5.51.47_PM_3_f0yj63.jpg" />
 								<p className="mt-2 text-custom-green">@azuaje</p>
 							</div>
 						</div>
