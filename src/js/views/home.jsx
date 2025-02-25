@@ -53,7 +53,7 @@ export const Home = () => {
 							<div className="bg-custom-yellow p-4 rounded-lg">
 								<img alt="Imagen de Sabas Nieves" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263845/WhatsApp_Image_2025-02-22_at_5.51.47_PM_ouyvmq.jpg" />
 								<h3 className="mt-4 h4 fw-bold text-custom-green">Sabas Nieves</h3>
-								<p className="mt-2 text-custom-green">Ruta fácil - 1.5 km - 1 hora</p>
+								<p className="mt-2 text-custom-green">Ruta fácil - 1.5 km - 1 hora aprox</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
@@ -108,28 +108,28 @@ export const Home = () => {
 					<div className="row g-4 bg-custom-green p-4 rounded-lg">
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte1" className="w-100 h-70 object-cover rounded" src="imagenes/" />
+								<img alt="Imagen de comparte1" className="w-100  object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740326155/WhatsApp_Image_2025-02-23_at_10.36.07_AM_hb8a8x.jpg" />
 
 								<p className="mt-2 text-custom-green">@DanielFuentes</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte2" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264151/WhatsApp_Image_2025-02-22_at_5.51.47_PM_2_c6asdo.jpg" />
+								<img alt="Imagen de comparte2" className="w-100  object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264151/WhatsApp_Image_2025-02-22_at_5.51.47_PM_2_c6asdo.jpg" />
 
 								<p className="mt-2 text-custom-green">@AngelicaB</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte3" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264366/WhatsApp_Image_2025-02-22_at_5.51.47_PM_4_lvvfmf.jpg" />
+								<img alt="Imagen de comparte3" className="w-100  object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264366/WhatsApp_Image_2025-02-22_at_5.51.47_PM_4_lvvfmf.jpg" />
 
 								<p className="mt-2 text-custom-green">@Andrea_Diaz</p>
 							</div>
 						</div>
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg">
-								<img alt="Imagen de comparte4" className="w-100 h-70 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264227/WhatsApp_Image_2025-02-22_at_5.51.47_PM_3_f0yj63.jpg" />
+								<img alt="Imagen de comparte4" className="w-100 object-cover rounded" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264227/WhatsApp_Image_2025-02-22_at_5.51.47_PM_3_f0yj63.jpg" />
 								<p className="mt-2 text-custom-green">@azuaje</p>
 							</div>
 						</div>
