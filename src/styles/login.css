@@ -1,0 +1,59 @@
+.logo-login{
+    height: 300px;
+}
+
+.bg-inputs{
+    background-color: #f1f6aa;
+}
+
+.borde{
+    border-radius: 25px;
+}
+
+.inputs-width{
+    width: 400px;
+    background-color: #759c33;
+}
+
+.container-width{
+    width:550px;
+}
+
+.borde-input{
+    border-radius: 15px;
+    color: white;
+}
+
+.text-white{
+    color: white;
+}
+
+.borde-input:focus{
+    background-color: #31470b; /* Color del placeholder */
+}
+
+.button-width{
+    width: 200px;
+}
+
+.icono-login-google{
+    width: 35px;
+    height: 40px;
+}
+
+.icono-login-face{
+    width: 50px;
+    height: 40px;
+}
+
+.nav-link.active {
+    background-color: transparent !important; 
+    color: inherit !important; 
+    background-color: #31470b !important;
+    color: white !important;
+}
+
+.nav-link {
+    color: black !important; 
+}
+  
