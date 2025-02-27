@@ -3,33 +3,38 @@ import "../../styles/home.css";
 
 export const Home = () => {
 	return (
-		<div className="principal w-100">
+		<div className="principal w-100">  
+		{/* Sección de la imagen de fondo con el título y el buscador*/}
 			<section className="position-relative">
 				<img alt="Imagen de montañas" className="w-100 h-100 object-cover" src='https://res.cloudinary.com/dntc8trob/image/upload/v1740262967/imagen-header_xgih0d.jpg' />
-				<div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white bg-dark bg-opacity-50">
-
+				<div className="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-white bg-dark bg-opacity-50"style={{ padding: '0 40px' }}>
 					<div className="d-flex flex-column flex-md-row justify-content-between w-100 px-4">
-
-						<h1 className="display-5 fw-bold text-center text-md-start col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green">VIVE LA AVENTURA</h1>
-
-						<p className="lead mt-2 text-justify text-md-end col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green">Viva los detalles de las mejores caminatas, vistas y lugares secretos del parque nacional Ávila.</p>
+						{/*Titulo principal*/}
+						<h1 className="display-5 fw-bold text-center text-md-start col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-green"style={{ fontSize: '6rem' }}>VIVE LA<br /> AVENTURA</h1>
+						{/*Parrafo principal*/}
+						<p className="lead mt-2 text-justify text-md-end col-sm-12 col-md-6 col-lg-6 col-xl-6 text-custom-paragraph"style={{ fontSize: '2rem' }}>Viva los detalles de las mejores caminatas, vistas y lugares secretos del parque nacional Ávila.</p>
 					</div>
-
-					<input className="mt-4 px-4 py-2 rounded-lg bg-custom-green text-white" placeholder="Buscar por..." type="text" />
+						{/*Buscar*/}
+					<div className="w-100 d-flex justify-content-center" style={{ position: 'absolute', bottom: '20px' }}>
+                        <input className="px-4 py-2 rounded-lg bg-custom-green text-custom-paragraph" style={{ width: '40%', height: '50px' }} placeholder="Buscar por..." type="text-custom-paragraph" />
+                    </div>
 				</div>
 			</section>
 
-
-			<section className="py-5 bg-custom-yellow">
-				<div className="container">
-					<div className="row align-items-center">
+			{/* Sección de Mision Vision*/}
+			<section className="py-5 bg-custom-yellow"style={{ width: '1440px', height: '600px' }}>
+                <div className="container h-100">
+                    <div className="row align-items-center h-100">
+						{/*Imagen Logo*/}
 						<div className="col-md-4 text-center">
-							<img alt="Logo de Avilamet" className="img-fluid" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png" />
+							<img alt="Logo de Avilamet" className="img-fluid" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png" 
+							style={{height: '400px', width: '500px' }} />
 						</div>
+						{/*Mision y Vision*/}
 						<div className="col-md-8">
 							<div className="mb-5">
-								<h2 className="h2 fw-bold text-custom-green">MISIÓN</h2>
-								<p className="mt-3 text-dark">
+								<h2 className="h2 fw-bold text-custom-green"style={{ fontSize: '3rem' }}>MISIÓN</h2>
+								<p className="mt-3 text-custom-paragraph">
 									Fomentar la relación entre los estudiantes de la Universidad Metropolitana y el Avila, su vida, su diversidad ambiental y su uso. Promover el disfrute al aire libre, el cuidado del medio ambiente y el compromiso con la comunidad.
 								</p>
 							</div>

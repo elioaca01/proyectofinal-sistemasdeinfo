@@ -1,3 +1,4 @@
+
 body {
     font-family: 'Roboto', sans-serif;
     margin: 0;
@@ -73,7 +74,7 @@ footer {
       rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
   }
   
-  .input-verde::placeholder {
+.input-verde::placeholder {
     color: #31470b; /* Color del placeholder */
     opacity: 0.7; /* Opacidad para que no sea demasiado intenso */
   }
@@ -87,8 +88,23 @@ footer {
 .rounded-lg {
     border-radius: 15px;
 }
+
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en verde*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 .text-custom-green {
     color: #31470b;
+    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
+}
+
+/*Esquema para letras en tipografía Montserrat en verde y amarillo*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap');
+.text-custom-paragraph {
+    color: #31470b;
+    font-family: 'Montserrat', sans-serif; 
+}
+.text-custom-paragraph2 {
+    color: #fef9c3;
+    font-family: 'Montserrat', sans-serif; 
 }
 
 .logo-universidad{
@@ -113,3 +129,4 @@ footer {
  .h-70 {
     height: 9rem;
 } 
+
