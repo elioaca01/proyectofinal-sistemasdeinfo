@@ -25,7 +25,7 @@ export const Home = () => {
 					<div className="w-100 d-flex justify-content-center " 
 					style={{ position: 'absolute', bottom: '20px' }}>
 					<input className="px-4 py-2 rounded-lg bg-custom-green" 
-					style={{ width: '40%', height: '50px' , color: '#fef9c3' }} 
+					style={{ width: '40%', height: '50px' , color: '50px' }} 
 					placeholder="Buscar por..." 
 					type="text" />
 					</div>
@@ -171,7 +171,8 @@ export const Home = () => {
 						<div className="col-md-6 col-lg-3">
 							<div className="bg-custom-yellow p-4 rounded-lg"
 							style={{ width: '300px', height: '320px' }}>
-								<img alt="Imagen de comparte2" className="w-100  object-cover rounded" 
+								<img alt="Imagen de comparte2" 
+								className="w-100  object-cover rounded" 
 								src="https://res.cloudinary.com/dntc8trob/image/upload/v1740264151/WhatsApp_Image_2025-02-22_at_5.51.47_PM_2_c6asdo.jpg" 
 								style={{ width: '300px', height: '250px', objectFit: 'cover' }}/>
 								<p className="mt-2 text-custom-green">@AngelicaB</p>
