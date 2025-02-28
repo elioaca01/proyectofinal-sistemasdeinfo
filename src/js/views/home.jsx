@@ -22,10 +22,10 @@ export const Home = () => {
 					style={{ fontSize: '2rem' }}>
 						Viva los detalles de las mejores caminatas, vistas y lugares secretos del parque nacional Ávila.</p></div>
 					{/*Buscar*/}
-					<div className="w-100 d-flex justify-content-center" 
+					<div className="w-100 d-flex justify-content-center " 
 					style={{ position: 'absolute', bottom: '20px' }}>
-					<input className="px-4 py-2 rounded-lg bg-custom-green text-custom-paragraph" 
-					style={{ width: '40%', height: '50px' }} 
+					<input className="px-4 py-2 rounded-lg bg-custom-green" 
+					style={{ width: '40%', height: '50px' , color: '#fef9c3' }} 
 					placeholder="Buscar por..." 
 					type="text" />
 					</div>
