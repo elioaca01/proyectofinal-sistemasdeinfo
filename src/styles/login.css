@@ -1,6 +1,12 @@
-.logo-login{
-    height: 300px;
-}
+.icono-login {
+    width: 50px;
+    height: 50px;
+  }
+  .icono-login2 {
+    width: 50px;
+    height: 40px;
+  }
+
 
 .bg-inputs{
     background-color: #f1f6aa;
@@ -12,7 +18,7 @@
 
 .inputs-width{
     width: 400px;
-    background-color: #759c33;
+    background-color: #31470b;
 }
 
 .container-width{
@@ -25,35 +31,68 @@
 }
 
 .text-white{
-    color: white;
+    color: #fef9c3;
 }
 
 .borde-input:focus{
     background-color: #31470b; /* Color del placeholder */
+    color: #fef9c3;
 }
 
 .button-width{
     width: 200px;
 }
 
-.icono-login-google{
-    width: 35px;
-    height: 40px;
+
+/*Color para los titulos en los inputs*/
+.placeholder-custom::placeholder {
+    color: #b0ae8b;
 }
 
-.icono-login-face{
-    width: 50px;
-    height: 40px;
+
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en verde*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+.text-custom-green {
+    color: #31470b;
+    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
+}
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en amarillo*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+.text-custom-green2 {
+    color: #fef9c3;
+    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
 }
 
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en amarillo mas claro*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+.text-custom-green3 {
+    color: #d9d6ad;
+    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
+}
+
+
+/*Esquema para letras en tipografía Montserrat en verde y amarillo*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap');
+.text-custom-paragraph {
+    color: #31470b;
+    font-family: 'Montserrat', sans-serif; 
+}
+
+.text-custom-paragraph2 {
+    color: #fef9c3;
+    font-family: 'Montserrat', sans-serif; 
+}
+
+
+/*Cambios de colores para activar cuando se posiciona el cursor*/
 .nav-link.active {
     background-color: transparent !important; 
     color: inherit !important; 
-    background-color: #31470b !important;
-    color: white !important;
+    background-color: #31470b!important;
+    color: #fef9c3 !important;
 }
 
 .nav-link {
-    color: black !important; 
+    color: #31470b !important; 
 }
   
