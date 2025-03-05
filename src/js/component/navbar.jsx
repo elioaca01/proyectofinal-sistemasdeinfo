@@ -1,7 +1,9 @@
-import React from "react";
+import React,{useContext} from "react";
+import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 
 export const Navbar = () => {
+	const {store,actions} = useContext(Context)
 	return (
 		<nav className="py-3 bg-custom-yellow">
 			<div className="container d-flex justify-content-between align-items-center">
@@ -12,28 +14,34 @@ export const Navbar = () => {
 
 				<nav className="d-none d-md-flex align-items-center gap-3 fw-bold">
 					<Link to='/' className="text-decoration-none">
-						<a className="text-custom-green text-decoration-none" >Destino</a>
+						<span  className="text-custom-green text-decoration-none" >Destino</span >
 					</Link>
 					<Link to='/' className="text-decoration-none">
-						<a className="text-custom-green text-decoration-none" >Reservación</a>
+						<span  className="text-custom-green text-decoration-none" >Reservación</span >
 					</Link>
 					<Link to='/' className="text-decoration-none">
-						<a className="text-custom-green text-decoration-none">Foro</a>
+						<span  className="text-custom-green text-decoration-none">Foro</span >
 					</Link>
 					<Link to="" className="text-decoration-none" >
-						<a className="text-custom-green text-decoration-none" >Información</a>
+						<span  className="text-custom-green text-decoration-none" >Información</span >
 					</Link>
 					<Link to="" className="text-decoration-none">
-						<a className="text-custom-green text-decoration-none">Sobre Avilamet</a>
+						<span  className="text-custom-green text-decoration-none">Sobre Avilamet</span>
 					</Link>
 				</nav>
 
-				<div className="d-flex align-items-center gap-4">
-					<Link to="/login">
-						<button className="btn btn-success bg-custom-green">Iniciar sesión</button>
+				{store.token? 
+					<div className="d-flex align-items-center gap-4">
+					<Link to="/">
+						<button className="btn btn-success bg-custom-green" onClick={()=>actions.close()} >Cerrar sesión</button>
 					</Link>
-					{/* <button className="btn btn-outline-success bg-custom-yellow">Registrarse</button> */}
-				</div>
+					</div>:
+					 <div className="d-flex align-items-center gap-4">
+					 <Link to="/login">
+					 	<button className="btn btn-success bg-custom-green">Iniciar sesión</button>
+					</Link>
+					 </div>
+				}		 
 			</div>
 		</nav>
 		
