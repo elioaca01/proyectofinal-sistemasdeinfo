@@ -8,8 +8,8 @@ export const Navbar = () => {
 		<nav className="py-3 bg-custom-yellow">
 			<div className="container d-flex justify-content-between align-items-center">
 				<div className="d-flex align-items-center">
-					<img alt="Logo de la Universidad Metropolitana" className="logo-universidad pb-1" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263475/Logo-unimet-6-removebg-preview_x7gf7b.png"/>
-					<img alt="Logo de Avilamet" className="logo ms-4" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png"/>
+					<img alt="Logo de la Universidad Metropolitana" className="logo-universidad pb-1" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263475/Logo-unimet-6-removebg-preview_x7gf7b.png" />
+					<img alt="Logo de Avilamet" className="logo ms-4" src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png" />
 				</div>
 
 				<nav className="d-none d-md-flex align-items-center gap-3 fw-bold">
@@ -32,18 +32,17 @@ export const Navbar = () => {
 
 				{store.token? 
 					<div className="d-flex align-items-center gap-4">
-					<Link to="/">
-						<button className="btn btn-success bg-custom-green" onClick={()=>actions.close()} >Cerrar sesión</button>
-					</Link>
+						<Link to="/">
+							<button className="btn btn-success bg-custom-green" onClick={()=>actions.close()} >Cerrar sesión</button>
+						</Link>
 					</div>:
 					 <div className="d-flex align-items-center gap-4">
-					 <Link to="/login">
-					 	<button className="btn btn-success bg-custom-green">Iniciar sesión</button>
-					</Link>
+					 	<Link to="/login">
+					 		<button className="btn btn-success bg-custom-green">Iniciar sesión</button>
+						</Link>
 					 </div>
 				}		 
 			</div>
 		</nav>
-		
-	)
+	);
 };
