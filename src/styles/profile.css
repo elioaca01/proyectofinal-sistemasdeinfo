@@ -1,0 +1,110 @@
+/* Estilos actualizados para profile.css para parecerse a login.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap');
+
+/* Fondo y contenedores */
+.bg-inputs {
+    background-color: #f1f6aa;
+}
+.borde {
+    border-radius: 15px;
+}
+.borde-input {
+    border-radius: 10px;
+    color: white;
+}
+.inputs-width {
+    width: 350px;
+    background-color: #31470b;
+    border: none;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+.container-width {
+    width: 500px;
+}
+.button-width {
+    width: 200px;
+}
+
+/* Estilos de texto */
+.text-custom-green {
+    color: #31470b;
+    font-family: 'Bebas Neue', sans-serif;
+}
+.text-custom-green2 {
+    color: #fef9c3;
+    font-family: 'Bebas Neue', sans-serif;
+}
+.text-custom-green3 {
+    color: #d9d6ad;
+    font-family: 'Bebas Neue', sans-serif;
+}
+.text-custom-paragraph {
+    color: #31470b;
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Placeholder personalizado */
+.placeholder-custom::placeholder {
+    color: #b0ae8b;
+}
+
+/* Inputs personalizados */
+input {
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 5px;
+    border: none;
+    background-color: #a2a87b;
+    color: #31470b;
+    text-align: left;
+}
+
+/* Configuración del perfil */
+.configuracion-de-perfil {
+    text-align: left;
+    color: #31470b;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 10px;
+    left: 20px;
+}
+
+/* Botones */
+.button-instance, .button-instance2 {
+    background-color: #31470b;
+    color: #fef9c3;
+    border-radius: 5px;
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Bebas Neue', sans-serif;
+}
+.button-instance:hover, .button-instance2:hover {
+    background-color: #2a3e0b;
+}
+
+/* Estilo para el círculo de la foto */
+.ellipse-6 {
+    width: 200px;
+    height: 200px;
+    background-color: #31470b;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+
+/* Ajustes generales */
+.bg-custom-yellow {
+    background-color: #fef9c3;
+}
+.bg-custom-green {
+    background-color: #31470b;
+}
