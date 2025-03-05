@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 export const Footer = () => (
-	<footer classnNameName="footer py-5 text-center bg-custom-green ">
+	<footer className="footer py-5 text-center bg-custom-green ">
 		<div className="container text-center ">
             <div className="d-flex justify-content-center mt-3 gap-4 mb-4">
                 <i className="fab fa-facebook-f"></i>
@@ -18,17 +18,17 @@ export const Footer = () => (
                 </div>
                 <div className="col-md-4">
                     <h3 className="h4 fw-bold mb-3">Enlaces</h3>
-                    <p><a className="text-white text-decoration-none" href="#">Destino</a></p>
-                    <p><a className="text-white text-decoration-none" href="#">Reservación</a></p>
-                    <p><a className="text-white text-decoration-none" href="#">Foro</a></p>
-                    <p><a className="text-white text-decoration-none" href="#">Información</a></p>
+                    <p><span className="text-white text-decoration-none" >Destino</span></p>
+                    <p><span className="text-white text-decoration-none" >Reservación</span></p>
+                    <p><span className="text-white text-decoration-none" >Foro</span ></p>
+                    <p><span  className="text-white text-decoration-none" >Información</span></p>
                 </div>
                 <div className="col-md-4">
                     <h3 className="h4 fw-bold mb-3">Descubre</h3>
-                    <p><a className="text-white text-decoration-none" href="#">Sabas Nieves</a></p>
-                    <p><a className="text-white text-decoration-none" href="#">Lagunazo</a></p>
-                    <p><a className="text-white text-decoration-none" href="#">El Banquito</a></p>
-                    <p><a className="text-white text-decoration-none" href="#">Pico Naiguatá</a></p>
+                    <p><span  className="text-white text-decoration-none" >Sabas Nieves</span ></p>
+                    <p><span  className="text-white text-decoration-none" >Lagunazo</span ></p>
+                    <p><span  className="text-white text-decoration-none" >El Banquito</span ></p>
+                    <p><span  className="text-white text-decoration-none" >Pico Naiguatá</span ></p>
                 </div>
             </div>
         </div>

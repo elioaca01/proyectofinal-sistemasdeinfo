@@ -1,26 +1,9 @@
-import React from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { isAuthenticated, logout } from "../auth.js";
-import "../../styles/home.css";
+import React,{useContext} from "react";
+import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 export const Navbar = () => {
-	const navigate = useNavigate();
-	const location = useLocation();
-	const user = isAuthenticated();
-
-	const handleLogout = () => {
-		logout();
-		navigate("/login");
-	};
-
-	const goToProfile = () => {
-		if (isAuthenticated()) {
-			navigate("/profile");
-		} else {
-			navigate("/login");
-		}
-	};
-
+	const {store,actions} = useContext(Context)
 	return (
 		<nav className="py-3 bg-custom-yellow">
 			<div className="container d-flex justify-content-between align-items-center">
@@ -30,36 +13,35 @@ export const Navbar = () => {
 				</div>
 
 				<nav className="d-none d-md-flex align-items-center gap-3 fw-bold">
-					<Link to="/" className="text-custom-green text-decoration-none">Destino</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Reservación</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Foro</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Información</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Sobre Avilamet</Link>
+					<Link to='/' className="text-decoration-none">
+						<span  className="text-custom-green text-decoration-none" >Destino</span >
+					</Link>
+					<Link to='/' className="text-decoration-none">
+						<span  className="text-custom-green text-decoration-none" >Reservación</span >
+					</Link>
+					<Link to='/' className="text-decoration-none">
+						<span  className="text-custom-green text-decoration-none">Foro</span >
+					</Link>
+					<Link to="" className="text-decoration-none" >
+						<span  className="text-custom-green text-decoration-none" >Información</span >
+					</Link>
+					<Link to="" className="text-decoration-none">
+						<span  className="text-custom-green text-decoration-none">Sobre Avilamet</span>
+					</Link>
 				</nav>
 
-				<div className="d-flex align-items-center gap-4">
-					{user ? (
-						<>
-							{/* 🔴 Mostrar botón Perfil solo si NO estás en /profile */}
-							{location.pathname !== "/profile" && (
-								<Link to="/profile">
-									<button className="btn btn-success bg-custom-green text-white">
-										Perfil
-									</button>
-								</Link>
-							)}
-							<button onClick={handleLogout} className="btn btn-danger text-white">
-								Cerrar sesión
-							</button>
-						</>
-					) : (
-						<Link to="/login">
-							<button className="btn btn-success bg-custom-green text-white">
-								Iniciar sesión
-							</button>
+				{store.token? 
+					<div className="d-flex align-items-center gap-4">
+						<Link to="/">
+							<button className="btn btn-success bg-custom-green" onClick={()=>actions.close()} >Cerrar sesión</button>
 						</Link>
-					)}
-				</div>
+					</div>:
+					 <div className="d-flex align-items-center gap-4">
+					 	<Link to="/login">
+					 		<button className="btn btn-success bg-custom-green">Iniciar sesión</button>
+						</Link>
+					 </div>
+				}		 
 			</div>
 		</nav>
 	);

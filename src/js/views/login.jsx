@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
+import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import {
     createUserWithEmailAndPassword,
@@ -12,6 +13,7 @@ import { auth } from "../firebase.js";
 import "../../styles/login.css";
 
 const Login = () => {
+    const {store,actions} = useContext(Context)
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -63,6 +65,7 @@ const Login = () => {
         }
     };
 
+
     const handleLogin = async (e) => {
         e.preventDefault();
         setError("");
@@ -75,6 +78,7 @@ const Login = () => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             localStorage.setItem("user", JSON.stringify(userCredential.user));
+            const add = actions.addToken(userCredential.user['accessToken'])
             navigate("/profile");
         } catch (error) {
             console.error("Error al iniciar sesión:", error.message);
@@ -168,112 +172,158 @@ const Login = () => {
                             </nav>
 
                             <div className="tab-content mt-2" id="nav-tabContent">
-                                {isLogin ? (
-                                    <form onSubmit={handleLogin} className="d-flex flex-column align-items-center">
-                                        <input
-                                            className="form-control form-control-lg inputs-width borde-input text-custom-green2 placeholder-custom"
-                                            type="email"
-                                            placeholder="Correo"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg text-dark inputs-width borde-input mt-3 text-custom-green2 placeholder-custom"
-                                            type="password"
-                                            placeholder="Contraseña"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
-                                        {error && <p className="text-danger">{error}</p>}
+                                {isLogin && (
+                                    <div>
+                                        <form onSubmit={handleLogin} className="d-flex flex-column align-items-center">
+                                            <input
+                                                className="form-control form-control-lg inputs-width borde-input text-custom-green2 placeholder-custom"
+                                                type="email"
+                                                placeholder="Correo"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg text-dark inputs-width borde-input mt-3 text-custom-green2 placeholder-custom"
+                                                type="password"
+                                                placeholder="Contraseña"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                            {error && <p className="text-danger">{error}</p>}
 
-                                        <button
-                                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom"
-                                            type="submit"
-                                        >
-                                            Iniciar sesión
-                                        </button>
+                                            <button
+                                                className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom"
+                                                type="submit"
+                                            >
+                                                Iniciar sesión
+                                            </button>
 
-                                        <div className="container d-flex flex-column align-items-center mb-4 mt-3 text-custom-green">
-                                            <h5>--CONTINUAR CON--</h5>
-                                            <div className="iconos d-flex justify-content-center">
-                                                <button onClick={handleGoogleLogin} className="btn-social">
-                                                    <img
-                                                        className="icono-login"
-                                                        src="https://res.cloudinary.com/dntc8trob/image/upload/v1740431278/pngwing.com_5_xlprpf.png"
-                                                        alt="Google login"
-                                                        style={{ width: '50px', height: '50px' }}
-                                                    />
-                                                </button>
-                                                <button onClick={handleFacebookLogin} className="btn-social">
-                                                    <img
-                                                        className="icono-login2"
-                                                        src="https://res.cloudinary.com/dntc8trob/image/upload/v1740431488/pngwing.com_6_jgwllf.png"
-                                                        alt="Facebook login"
-                                                        style={{ width: '50px', height: '50px' }}
-                                                    />
-                                                </button>
-                                            </div>
+                                                {/*Boton de continuar con google y facebook */}
+                                                <div className="container d-flex flex-column align-items-center mb-4 mt-3 text-custom-green "
+                                                style={{
+                                                    letterSpacing: '1px',
+                                                    fontSize: '1rem',}}>
+                                                    <h5>--CONTINUAR CON--</h5>
+                                                    <div className="iconos d-flex justify-content-center">
+                                                        <button onClick={handleGoogleLogin} 
+                                                        className="btn-social"
+                                                            style={{ background: 'transparent', border: 'none', marginRight: '10px' }}>
+                                                            <img
+                                                                className="icono-login"
+                                                                src="https://res.cloudinary.com/dntc8trob/image/upload/v1740431278/pngwing.com_5_xlprpf.png"
+                                                                alt="Google login"
+                                                                style={{ width: '50px', height: '50px' }}
+                                                            />
+                                                        </button>
+                                                        <button onClick={handleFacebookLogin} 
+                                                        className="btn-social"
+                                                        style={{ background: 'transparent', border: 'none' }}>
+                                                            <img
+                                                                className="icono-login2"
+                                                                src="https://res.cloudinary.com/dntc8trob/image/upload/v1740431488/pngwing.com_6_jgwllf.png"
+                                                                alt="Facebook login"
+                                                                tyle={{ width: '50px', height: '50px'}}
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
-                                    </form>
-                                ) : (
-                                    <form onSubmit={handleRegister} className="d-flex flex-column align-items-center">
-                                        <input
-                                            className="form-control form-control-lg mb-2 inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="text"
-                                            placeholder="Nombre"
-                                            value={name}
-                                            onChange={(e) => setName(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="text"
-                                            placeholder="Apellido"
-                                            value={lastName}
-                                            onChange={(e) => setLastName(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="email"
-                                            placeholder="Correo"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="tel"
-                                            placeholder="Teléfono"
-                                            value={phone}
-                                            onChange={(e) => setPhone(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="text"
-                                            placeholder="Nombre de usuario"
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="password"
-                                            placeholder="Contraseña"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
-                                        <input
-                                            className="form-control form-control-lg text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
-                                            type="password"
-                                            placeholder="Confirma contraseña"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                        />
-                                        {error && <p className="text-danger">{error}</p>}
-                                        <button
-                                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom"
+                                )}
+
+                                {/*validacion, input, correo y contraseña - registro */}
+                                {!isLogin && (
+                                    <div className="tab-pane fade show active" 
+                                    id="nav-profile">
+                                        <form onSubmit={handleRegister} 
+                                        className="d-flex flex-column align-items-center">
+                                            <input
+                                                className="form-control form-control-lg mb-2 inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="text"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Nombre"
+                                                aria-label="Nombre"
+                                                value={name}
+                                                onChange={(e) => setName(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="text"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Apellido"
+                                                aria-label="Apellido"
+                                                value={lastName}
+                                                onChange={(e) => setLastName(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="email"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Correo"
+                                                aria-label="Correo"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="tel"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Teléfono"
+                                                aria-label="Teléfono"
+                                                value={phone}
+                                                onChange={(e) => setPhone(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="text"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Nombre de usuario"
+                                                aria-label="Nombre de usuario"
+                                                value={username}
+                                                onChange={(e) => setUsername(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="password"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Contraseña"
+                                                aria-label="Contraseña"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                            />
+                                            <input
+                                                className="form-control form-control-lg text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                type="password"
+                                                style={{
+                                                    letterSpacing: '2px',
+                                                    fontSize: '1rem',}}
+                                                placeholder="Confirma contraseña"
+                                                aria-label="Confirma contraseña"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                            />
+                                            {error && <p className="text-danger">{error}</p>}
+                                            <button className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom" 
                                             type="submit"
-                                        >
-                                            Crear cuenta
-                                        </button>
-                                    </form>
+                                            style={{
+                                                letterSpacing: '2px',
+                                                fontSize: '1.5rem',}}>
+                                                Crear cuenta
+                                            </button>
+                                        </form>
+                                    </div>
                                 )}
                             </div>
                         </div>
