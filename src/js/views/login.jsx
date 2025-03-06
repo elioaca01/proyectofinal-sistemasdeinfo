@@ -56,7 +56,7 @@ const Login = () => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             localStorage.setItem("user", JSON.stringify(userCredential.user));
-            navigate("/profile");
+            navigate("/");  // 👈 Ir al Home después de registrarse
         } catch (error) {
             console.error("Error al registrar usuario:", error.message);
             setError("Error al registrar el usuario. Intenta nuevamente.");
@@ -75,7 +75,7 @@ const Login = () => {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             localStorage.setItem("user", JSON.stringify(userCredential.user));
-            navigate("/profile");
+            navigate("/");  // 👈 Ir al Home después de iniciar sesión
         } catch (error) {
             console.error("Error al iniciar sesión:", error.message);
             setError("Error al iniciar sesión. Verifica tus credenciales.");
@@ -87,7 +87,7 @@ const Login = () => {
         try {
             const result = await signInWithPopup(auth, provider);
             localStorage.setItem("user", JSON.stringify(result.user));
-            navigate("/profile");
+            navigate("/");  // 👈 Ir al Home después de iniciar sesión con Google
         } catch (error) {
             console.error("Error con Google:", error.message);
             setError("Error al iniciar sesión con Google.");
@@ -99,12 +99,13 @@ const Login = () => {
         try {
             const result = await signInWithPopup(auth, provider);
             localStorage.setItem("user", JSON.stringify(result.user));
-            navigate("/profile");
+            navigate("/");  // 👈 Ir al Home después de iniciar sesión con Facebook
         } catch (error) {
             console.error("Error con Facebook:", error.message);
             setError("Error al iniciar sesión con Facebook.");
         }
     };
+
 
 
     return (
