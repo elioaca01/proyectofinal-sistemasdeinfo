@@ -71,7 +71,7 @@ export const Profile = ({ className, ...props }) => {
             <div className="d-flex flex-column align-items-center justify-content-center"
                 style={{
                     maxWidth: "70%",
-                    width: "30%",
+                    width: "100%",
                     backgroundColor: "#f1f6aa",
                     borderRadius: "15px",
                     padding: "20px",
