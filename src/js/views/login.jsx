@@ -8,7 +8,6 @@ import {
     FacebookAuthProvider,
     signInWithPopup
 } from "firebase/auth";
-import { isAuthenticated } from "../auth.js";
 import { auth } from "../firebase.js";
 import "../../styles/login.css";
 
