@@ -114,7 +114,8 @@ const Login = () => {
             <div className="container">
                 <div className="row">
                     <div className="col-12 col-md-5 d-flex flex-column align-items-center mt-5">
-                        <h2 className="text-center text-custom-paragraph" style={{ fontSize: '2rem' }}>
+                        <h2 className="text-center text-custom-paragraph" 
+                        style={{ fontSize: '2rem' }}>
                             ¡Bienvenido a esta nueva aventura!
                         </h2>
                         <img
@@ -127,7 +128,8 @@ const Login = () => {
                     {/*Formulario de inicio de sesión */}
                     <div className="col-12 col-md-7 mt-5">
                         <div className="container bg-inputs borde container-width">
-                            <nav className="fs-3 d-flex justify-content-center borde p-3" style={{ backgroundColor: '#fef9c3' }}>
+                            <nav className="fs-3 d-flex justify-content-center borde p-3" 
+                            style={{ backgroundColor: '#fef9c3' }}>
                                 <div className="nav nav-tabs bg-inputs" id="nav-tab" role="tablist">
                                     <button
                                         className="nav-link text-custom-green2"

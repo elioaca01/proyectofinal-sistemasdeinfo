@@ -67,15 +67,17 @@ export const Profile = ({ className, ...props }) => {
     };
 
     return (
-        <div className="profile d-flex flex-column align-items-center" style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "100vh" }}>
+        <div className="profile d-flex flex-column align-items-center" 
+        style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "70vh" }}>
+            {/* Contenedor de input para config, perfil. */}
             <div className="d-flex flex-column align-items-center justify-content-center"
                 style={{
                     maxWidth: "70%",
-                    width: "100%",
+                    width: "60%",
                     backgroundColor: "#f1f6aa",
                     borderRadius: "15px",
                     padding: "20px",
-                    border: "1px solid #31470b",
+                    border: "3px solid #31470b",
                     position: "relative"
                 }}>
 
@@ -93,6 +95,7 @@ export const Profile = ({ className, ...props }) => {
                         color: "#31470b"
                     }}>✖</button>
 
+                {/* Título del contenedor */}
                 <h2 style={{
                     position: "absolute",
                     top: "10px",
