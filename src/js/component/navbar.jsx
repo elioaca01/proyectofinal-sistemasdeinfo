@@ -54,7 +54,7 @@ export const Navbar = () => {
 				{/* Contenedor para los enlaces de navegación */}
 				<nav className="d-none d-md-flex align-items-center gap-5 fw-bold "
 				style={{ marginLeft: "100px", marginRight: "100px", marginTop: "-18px" }}>
-					<Link to="/" className="text-custom-green text-decoration-none link-hover"
+					<Link to="/destination" className="text-custom-green text-decoration-none link-hover"
 					style={{ fontSize: '2rem' }}
 					>Destino</Link>
 					<Link to="/" className="text-custom-green text-decoration-none link-hover"

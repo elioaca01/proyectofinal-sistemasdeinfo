@@ -1,0 +1,13 @@
+.w-100 {
+    width: 100% !important;
+  }
+
+.bg-custom-green {
+    background-color: #31470b;
+}
+.bg-custom-yellow {
+    background-color: #fef9c3;
+}
+.rounded-lg {
+    border-radius: 15px;
+}
