@@ -43,6 +43,30 @@
     width: 200px;
 }
 
+.input-yellow::placeholder {
+    color: #31470b; /* Color del placeholder */
+}
+
+.input-yellow {
+    color: #fef9c3!important; /* Color del texto cuando el usuario escribe */
+}
+
+/* Estilo para el cursor se posicione*/
+.btn-hover:hover {
+    background-color: transparent !important;
+    border: 2px solid #31470b !important;
+    color: #31470b !important;
+}
+
+.btn-hover2:hover {
+    background-color: transparent !important;
+    border: 2px solid #fef9c3 !important;
+    color: #fef9c3 !important;
+}
+
+.link-hover:hover {
+    color: #557c12 !important;
+}
 
 /*Color para los titulos en los inputs*/
 .placeholder-custom::placeholder {

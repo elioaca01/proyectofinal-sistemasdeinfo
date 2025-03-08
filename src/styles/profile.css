@@ -30,23 +30,54 @@
 }
 
 /* Estilos de texto */
-.text-custom-green {
-    color: #31470b;
-    font-family: 'Bebas Neue', sans-serif;
-}
-.text-custom-green2 {
-    color: #fef9c3;
-    font-family: 'Bebas Neue', sans-serif;
-}
-.text-custom-green3 {
-    color: #d9d6ad;
-    font-family: 'Bebas Neue', sans-serif;
-}
-.text-custom-paragraph {
-    color: #31470b;
-    font-family: 'Montserrat', sans-serif;
+
+.input-yellow::placeholder {
+    color: #31470b; /* Color del placeholder */
 }
 
+.input-yellow {
+    color: #fef9c3!important; /* Color del texto cuando el usuario escribe */
+}
+
+/* Estilo para el cursor se posicione*/
+.btn-hover:hover {
+    background-color: transparent !important;
+    border: 2px solid #31470b !important;
+    color: #31470b !important;
+}
+
+.btn-hover2:hover {
+    background-color: transparent !important;
+    border: 2px solid #fef9c3 !important;
+    color: #fef9c3 !important;
+}
+
+.link-hover:hover {
+    color: #557c12 !important;
+}
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en verde*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+.text-custom-green {
+    color: #31470b;
+    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
+}
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en amarillo*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+.text-custom-green2 {
+    color: #fef9c3;
+    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
+}
+
+/*Esquema para letras en tipografía Montserrat en verde y amarillo*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@400;700&display=swap');
+.text-custom-paragraph {
+    color: #31470b;
+    font-family: 'Montserrat', sans-serif; 
+}
+.text-custom-paragraph2 {
+    color: #fef9c3;
+    font-family: 'Montserrat', sans-serif; 
+}
 /* Placeholder personalizado */
 .placeholder-custom::placeholder {
     color: #b0ae8b;

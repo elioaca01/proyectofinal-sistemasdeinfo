@@ -144,7 +144,7 @@ const Login = () => {
                                             borderRadius: '5px',
                                             cursor: 'pointer',
                                             marginRight: '20px',
-                                            width: '40px',
+                                            width: '50px',
                                             height: '40px',
                                             display: 'flex',
                                             justifyContent: 'center',
@@ -175,14 +175,14 @@ const Login = () => {
                                     <div>
                                         <form onSubmit={handleLogin} className="d-flex flex-column align-items-center">
                                             <input
-                                                className="form-control form-control-lg inputs-width borde-input text-custom-green2 placeholder-custom"
+                                                className="form-control form-control-lg inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="email"
                                                 placeholder="Correo"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg text-dark inputs-width borde-input mt-3 text-custom-green2 placeholder-custom"
+                                                className="form-control form-control-lg text-dark inputs-width borde-input mt-3 text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="password"
                                                 placeholder="Contraseña"
                                                 value={password}
@@ -191,8 +191,9 @@ const Login = () => {
                                             {error && <p className="text-danger">{error}</p>}
 
                                             <button
-                                                className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom"
+                                                className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
                                                 type="submit"
+                                                style={{fontSize: '1.2rem'}}
                                             >
                                                 Iniciar sesión
                                             </button>
@@ -238,7 +239,7 @@ const Login = () => {
                                         <form onSubmit={handleRegister}
                                             className="d-flex flex-column align-items-center">
                                             <input
-                                                className="form-control form-control-lg mb-2 inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg mb-2 inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="text"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -250,7 +251,7 @@ const Login = () => {
                                                 onChange={(e) => setName(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="text"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -262,7 +263,7 @@ const Login = () => {
                                                 onChange={(e) => setLastName(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="email"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -274,7 +275,7 @@ const Login = () => {
                                                 onChange={(e) => setEmail(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="tel"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -286,7 +287,7 @@ const Login = () => {
                                                 onChange={(e) => setPhone(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="text"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -298,7 +299,7 @@ const Login = () => {
                                                 onChange={(e) => setUsername(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg mb-2 text-dark inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="password"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -310,7 +311,7 @@ const Login = () => {
                                                 onChange={(e) => setPassword(e.target.value)}
                                             />
                                             <input
-                                                className="form-control form-control-lg text-dark inputs-width borde-input text-custom-green3 placeholder-custom"
+                                                className="form-control form-control-lg text-dark inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
                                                 type="password"
                                                 style={{
                                                     letterSpacing: '2px',
@@ -322,11 +323,11 @@ const Login = () => {
                                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                             />
                                             {error && <p className="text-danger">{error}</p>}
-                                            <button className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom"
+                                            <button className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
                                                 type="submit"
                                                 style={{
                                                     letterSpacing: '2px',
-                                                    fontSize: '1.5rem',
+                                                    fontSize: '1.2rem',
                                                 }}>
                                                 Crear cuenta
                                             </button>
