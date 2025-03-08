@@ -16,9 +16,9 @@ export const Navbar = () => {
 	};
 
 	const handleRestrictedAccess = () => {
-        alert("Debes registrarte o iniciar sesión para acceder a esta función.");
-        navigate("/login");
-    };
+		alert("Debes registrarte o iniciar sesión para acceder a esta función.");
+		navigate("/login");
+	};
 
 	{/*
 	const goToProfile = () => {
@@ -33,38 +33,40 @@ export const Navbar = () => {
 	const isLoginView = location.pathname === "/login";
 
 	return (
-		<nav className="py-3 bg-custom-yellow" 
-		style={{ height: "100px"}}>
+		<nav className="py-3 bg-custom-yellow"
+			style={{ height: "100px" }}>
 			<div className="container d-flex justify-content-between align-items-center">
 				{/* Contenedor para los logos */}
 				<div className="d-flex align-items-center ">
 					<img
 						alt="Logo de la Universidad Metropolitana"
 						className="logo-universidad pb-1"
-						style={{ marginTop: "-18px" }} 
+						style={{ marginTop: "-25px" }}
 						src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263475/Logo-unimet-6-removebg-preview_x7gf7b.png"
 					/>
-					<img
-						alt="Logo de Avilamet"
-						className="logo ms-4"
-						style={{ marginTop: "-18px" }} 
-						src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png"
-					/>
+					<Link to="/">
+						<img
+							alt="Logo de la Universidad Metropolitana"
+							className="logo-universidad pb-1"
+							src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png"
+							style={{ marginTop: "-25px", width: "140px", height: "140px" }}
+						/>
+					</Link>
 				</div>
 				{/* Contenedor para los enlaces de navegación */}
 				<nav className="d-none d-md-flex align-items-center gap-5 fw-bold "
-				style={{ marginLeft: "100px", marginRight: "100px", marginTop: "-18px" }}>
+					style={{ marginLeft: "100px", marginRight: "100px", marginTop: "-25px" }}>
 					<Link to="/destination" className="text-custom-green text-decoration-none link-hover"
-					style={{ fontSize: '2rem' }}
+						style={{ fontSize: '2rem' }}
 					>Destino</Link>
 					<Link to="/" className="text-custom-green text-decoration-none link-hover"
-					style={{ fontSize: '2rem' }}
+						style={{ fontSize: '2rem' }}
 					>Reservación</Link>
 					<Link to="/" className="text-custom-green text-decoration-none link-hover"
-					style={{ fontSize: '2rem' }}
+						style={{ fontSize: '2rem' }}
 					>Foro</Link>
 					<Link to="/" className="text-custom-green text-decoration-none link-hover"
-					style={{ fontSize: '2rem' }}
+						style={{ fontSize: '2rem' }}
 					>Información</Link>
 				</nav>
 				{/* Contenedor para los botones de perfil y cerrar sesión */}
@@ -76,43 +78,51 @@ export const Navbar = () => {
 								{location.pathname !== "/profile" && (
 									<Link to="/profile">
 										<button className="btn btn-success bg-custom-green text-custom-paragraph2 btn-hover"
-										style={{ width: "150px", height: "50px", fontWeight: "bold", 
-											marginLeft: "10px", marginRight: "5px", marginTop: "-18px"}}>
+											style={{
+												width: "150px", height: "50px", fontWeight: "bold",
+												marginLeft: "10px", marginRight: "5px", marginTop: "-18px"
+											}}>
 											Perfil
 										</button>
 									</Link>
 								)}
-								<button 
-								onClick={handleLogout} 
-								className="btn btn-danger text-custom-paragraph2 btn-hover"
-								style={{ width: "150px", height: "50px", fontWeight: "bold", 
-									marginLeft: "10px", marginRight: "5px", marginTop: "-18px"}}>
+								<button
+									onClick={handleLogout}
+									className="btn btn-danger text-custom-paragraph2 btn-hover"
+									style={{
+										width: "150px", height: "50px", fontWeight: "bold",
+										marginLeft: "10px", marginRight: "5px", marginTop: "-25px"
+									}}>
 									Cerrar sesión
 								</button>
 							</>
 						) : (
 							<>
-							{/* SI NO ESTA LOGEADO*/}
+								{/* SI NO ESTA LOGEADO*/}
 								<Link to="/login">
 									<button className="btn btn-success bg-custom-green text-custom-paragraph2 btn-hover"
-									style={{ width: "150px", height: "50px", fontWeight: "bold", 
-									marginLeft: "10px", marginRight: "5px", marginTop: "-18px"}}>
+										style={{
+											width: "150px", height: "50px", fontWeight: "bold",
+											marginLeft: "10px", marginRight: "5px", marginTop: "-25px"
+										}}>
 										Iniciar sesión
 									</button>
-									</Link>
+								</Link>
 								<Link to="/login">
-								<button className="btn btn-primary bg-custom-yellow text-custom-paragraph btn-hover"
-								style={{ width: "150px", height: "50px", fontWeight: "bold", 
-									marginLeft: "5px", marginRight: "20px", marginTop: "-18px",
-									border: "3px solid #31470b"}}>
-								Registrarse
-								</button>
-                                </Link>
-                            </>
-                        )}
-                    </div>
-                )}
-            </div>
-        </nav>
-    );
+									<button className="btn btn-primary bg-custom-yellow text-custom-paragraph btn-hover"
+										style={{
+											width: "150px", height: "50px", fontWeight: "bold",
+											marginLeft: "5px", marginRight: "20px", marginTop: "-25px",
+											border: "3px solid #31470b"
+										}}>
+										Registrarse
+									</button>
+								</Link>
+							</>
+						)}
+					</div>
+				)}
+			</div>
+		</nav>
+	);
 };
