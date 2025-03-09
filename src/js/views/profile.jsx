@@ -48,7 +48,6 @@ export const Profile = ({ className, ...props }) => {
         localStorage.setItem("lastName", lastName);
         localStorage.setItem("email", email);
         localStorage.setItem("phone", phone);
-        localStorage.setItem("occupation", occupation);
         alert("¡Cambios guardados correctamente!");
     };
 
@@ -67,8 +66,8 @@ export const Profile = ({ className, ...props }) => {
     };
 
     return (
-        <div className="profile d-flex flex-column align-items-center" 
-        style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "70vh" }}>
+        <div className="profile d-flex flex-column align-items-center"
+            style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "70vh" }}>
             {/* Contenedor de input para config, perfil. */}
             <div className="d-flex flex-column align-items-center justify-content-center text-custom-green"
                 style={{
@@ -111,78 +110,78 @@ export const Profile = ({ className, ...props }) => {
                 <div className="d-flex align-items-center justify-content-center">
                     <div >
                         {/* Inputs con estados */}
-                        <input 
-                        className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow" 
-                        style={{ flex: 1, marginRight: "20px" }}
-                        value={name} 
-                        onChange={(e) => setName(e.target.value)} 
-                        placeholder="Nombre" 
-                         />
-                        <input 
-                        className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow" 
-                        style={{ flex: 1, marginRight: "20px" }}
-                        value={lastName} 
-                        onChange={(e) => setLastName(e.target.value)} 
-                        placeholder="Apellido"  />
-                        <input 
-                        className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow" 
-                        style={{ flex: 1, marginRight: "20px" }}
-                        value={email} 
-                        onChange={(e) => setEmail(e.target.value)} 
-                        placeholder="Correo" />
-                        <input 
-                        className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow" 
-                        style={{ flex: 1, marginRight: "20px" }}
-                        value={phone} 
-                        onChange={(e) => setPhone(e.target.value)} 
-                        placeholder="Teléfono" />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Nombre"
+                        />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Apellido" />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Correo" />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="Teléfono" />
 
                         {/* Botón para guardar cambios */}
-                        <button 
-                        className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
-                        onClick={handleSaveChanges} 
-                        style={buttonStyle}>
+                        <button
+                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
+                            onClick={handleSaveChanges}
+                            style={buttonStyle}>
                             Guardar Cambios
                         </button>
                     </div>
 
-                        <div className="d-flex flex-column align-items-center" 
+                    <div className="d-flex flex-column align-items-center"
                         style={{ marginLeft: "20px" }}>
-                        <div 
-                            className="ellipse-6" 
-                            style={{ 
-                                width: "100%", 
-                                maxWidth: "150px", 
-                                aspectRatio: "1", 
-                                borderRadius: "80%", 
-                                overflow: "hidden", 
-                                backgroundColor: "#31470b", 
-                                display: "flex", 
-                                justifyContent: "center", 
-                                alignItems: "center" 
+                        <div
+                            className="ellipse-6"
+                            style={{
+                                width: "100%",
+                                maxWidth: "150px",
+                                aspectRatio: "1",
+                                borderRadius: "80%",
+                                overflow: "hidden",
+                                backgroundColor: "#31470b",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
                             }}
                         >
                             {profileImage ? (
-                                <img 
-                                    src={profileImage} 
-                                    alt="Perfil" 
-                                    style={{ width: "100%", height: "100%", objectFit: "cover" }} 
+                                <img
+                                    src={profileImage}
+                                    alt="Perfil"
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
                                 />
                             ) : (
-                                <i 
-                                    className="fas fa-user" 
-                                    style={{ fontSize: "min(80px, 10vw)", color: "#fef9c3" }} 
-                                    aria-hidden="true" 
+                                <i
+                                    className="fas fa-user"
+                                    style={{ fontSize: "min(80px, 10vw)", color: "#fef9c3" }}
+                                    aria-hidden="true"
                                 ></i>
                             )}
                         </div>
 
                         {/* Input para subir foto */}
                         <input type="file" accept="image/*" onChange={handleChangePhoto} style={{ display: "none" }} id="fileInput" />
-                        <button 
-                        className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
-                        onClick={() => document.getElementById("fileInput").click()} 
-                        style={buttonStyle}>
+                        <button
+                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
+                            onClick={() => document.getElementById("fileInput").click()}
+                            style={buttonStyle}>
                             Cambiar Foto
                         </button>
                     </div>

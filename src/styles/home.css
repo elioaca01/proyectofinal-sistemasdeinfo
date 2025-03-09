@@ -85,6 +85,11 @@ footer {
 .bg-custom-yellow {
     background-color: #fef9c3;
 }
+
+.yellow{
+    color:#fef9c3;
+}
+
 .rounded-lg {
     border-radius: 15px;
 }
