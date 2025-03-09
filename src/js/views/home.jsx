@@ -8,11 +8,6 @@ export const Home = () => {
 	const navigate = useNavigate();
 	const user = isAuthenticated();  // ✔️ Verifica si el usuario está logueado
 
-	// 🔴 Función para cerrar sesión
-	const handleLogout = () => {
-		logout();
-		navigate("/login");
-	};
 
 	const goToProfile = () => {
 		if (isAuthenticated()) {

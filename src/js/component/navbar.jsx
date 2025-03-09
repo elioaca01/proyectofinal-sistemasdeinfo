@@ -15,41 +15,75 @@ export const Navbar = () => {
 		navigate("/login");
 	};
 
-	const goToProfile = () => {
-		if (isAuthenticated()) {
-			navigate("/profile");
-		} else {
-			navigate("/login");
-		}
+	const handleRestrictedAccess = () => {
+		alert("Debes registrarte o iniciar sesión para acceder a esta función.");
+		navigate("/login");
 	};
 
 	// No mostrar botones si estás en la vista de login
 	const isLoginView = location.pathname === "/login";
 
 	return (
-		<nav className="py-3 bg-custom-yellow">
+		<nav className="py-3 bg-custom-yellow" style={{ height: "100px" }}>
 			<div className="container d-flex justify-content-between align-items-center">
+				{/* Contenedor para los logos */}
 				<div className="d-flex align-items-center">
 					<img
 						alt="Logo de la Universidad Metropolitana"
 						className="logo-universidad pb-1"
+						style={{ marginTop: "-25px" }}
 						src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263475/Logo-unimet-6-removebg-preview_x7gf7b.png"
 					/>
-					<img
-						alt="Logo de Avilamet"
-						className="logo ms-4"
-						src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png"
-					/>
+					<Link to="/">
+						<img
+							alt="Logo de la Universidad Metropolitana"
+							className="logo-universidad pb-1"
+							src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263488/avilamet-removebg-preview_z9fhqx.png"
+							style={{ marginTop: "-25px", width: "140px", height: "140px" }}
+						/>
+					</Link>
 				</div>
 
-				<nav className="d-none d-md-flex align-items-center gap-3 fw-bold">
-					<Link to="/" className="text-custom-green text-decoration-none">Destino</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Reservación</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Foro</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Información</Link>
-					<Link to="/" className="text-custom-green text-decoration-none">Sobre Avilamet</Link>
+				{/* Contenedor para los enlaces de navegación */}
+				<nav
+					className="d-none d-md-flex align-items-center gap-5 fw-bold"
+					style={{
+						marginLeft: "100px",
+						marginRight: "100px",
+						marginTop: "-25px",
+					}}
+				>
+					<Link
+						to="/destination"
+						className="text-custom-green text-decoration-none link-hover"
+						style={{ fontSize: "2rem" }}
+					>
+						Destino
+					</Link>
+					<Link
+						to="/reservation"
+						className="text-custom-green text-decoration-none link-hover"
+						style={{ fontSize: "2rem" }}
+					>
+						Reservación
+					</Link>
+					<Link
+						to="/"
+						className="text-custom-green text-decoration-none link-hover"
+						style={{ fontSize: "2rem" }}
+					>
+						Foro
+					</Link>
+					<Link
+						to="/foro"
+						className="text-custom-green text-decoration-none link-hover"
+						style={{ fontSize: "2rem" }}
+					>
+						Información
+					</Link>
 				</nav>
 
+				{/* Sección de botones */}
 				{!isLoginView && (
 					<div className="d-flex align-items-center gap-4">
 						{user ? (
@@ -62,7 +96,10 @@ export const Navbar = () => {
 										</button>
 									</Link>
 								)}
-								<button onClick={handleLogout} className="btn btn-danger text-white">
+								<button
+									onClick={handleLogout}
+									className="btn btn-danger text-white"
+								>
 									Cerrar sesión
 								</button>
 							</>
@@ -71,7 +108,10 @@ export const Navbar = () => {
 								{store.token ? (
 									<div className="d-flex align-items-center gap-4">
 										<Link to="/">
-											<button className="btn btn-success bg-custom-green" onClick={() => actions.close()}>
+											<button
+												className="btn btn-success bg-custom-green"
+												onClick={() => actions.close()}
+											>
 												Cerrar sesión
 											</button>
 										</Link>
