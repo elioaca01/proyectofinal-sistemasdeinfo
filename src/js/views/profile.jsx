@@ -48,7 +48,6 @@ export const Profile = ({ className, ...props }) => {
         localStorage.setItem("lastName", lastName);
         localStorage.setItem("email", email);
         localStorage.setItem("phone", phone);
-        localStorage.setItem("occupation", occupation);
         alert("¡Cambios guardados correctamente!");
     };
 
@@ -67,15 +66,17 @@ export const Profile = ({ className, ...props }) => {
     };
 
     return (
-        <div className="profile d-flex flex-column align-items-center" style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "100vh" }}>
-            <div className="d-flex flex-column align-items-center justify-content-center"
+        <div className="profile d-flex flex-column align-items-center"
+            style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "70vh" }}>
+            {/* Contenedor de input para config, perfil. */}
+            <div className="d-flex flex-column align-items-center justify-content-center text-custom-green"
                 style={{
                     maxWidth: "70%",
-                    width: "100%",
+                    width: "60%",
                     backgroundColor: "#f1f6aa",
                     borderRadius: "15px",
                     padding: "20px",
-                    border: "1px solid #31470b",
+                    border: "3px solid #31470b",
                     position: "relative"
                 }}>
 
@@ -93,46 +94,94 @@ export const Profile = ({ className, ...props }) => {
                         color: "#31470b"
                     }}>✖</button>
 
+                {/* Título del contenedor */}
                 <h2 style={{
                     position: "absolute",
-                    top: "10px",
+                    top: "20px",
                     left: "20px",
-                    fontSize: "1.5rem",
+                    fontSize: "2rem",
                     color: "#31470b",
-                    fontFamily: "'Bebas Neue', sans-serif"
                 }}>CONFIGURACIÓN DE PERFIL</h2>
 
-                <hr style={{ width: "100%", borderTop: "1px solid #31470b", marginTop: "50px", marginBottom: "20px" }} />
+                {/* Línea decorativa */}
+                <hr style={{ width: "100%", borderTop: "3px solid #31470b", marginTop: "40px", marginBottom: "20px" }} />
 
+                {/* Contenedor de inputs y foto */}
                 <div className="d-flex align-items-center justify-content-center">
-                    <div className="d-flex flex-column" style={{ flex: 1, marginRight: "20px" }}>
+                    <div >
                         {/* Inputs con estados */}
-                        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre" style={inputStyle} />
-                        <input value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Apellido" style={inputStyle} />
-                        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Correo" style={inputStyle} />
-                        <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Teléfono" style={inputStyle} />
-                        <input value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="Ocupación" style={inputStyle} />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="Nombre"
+                        />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            placeholder="Apellido" />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Correo" />
+                        <input
+                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                            style={{ flex: 1, marginRight: "20px" }}
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="Teléfono" />
 
                         {/* Botón para guardar cambios */}
-                        <button onClick={handleSaveChanges} style={buttonStyle}>
+                        <button
+                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
+                            onClick={handleSaveChanges}
+                            style={buttonStyle}>
                             Guardar Cambios
                         </button>
                     </div>
 
-                    <div className="d-flex flex-column align-items-center" style={{ marginLeft: "20px" }}>
-                        <div className="ellipse-6">
+                    <div className="d-flex flex-column align-items-center"
+                        style={{ marginLeft: "20px" }}>
+                        <div
+                            className="ellipse-6"
+                            style={{
+                                width: "100%",
+                                maxWidth: "150px",
+                                aspectRatio: "1",
+                                borderRadius: "80%",
+                                overflow: "hidden",
+                                backgroundColor: "#31470b",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}
+                        >
                             {profileImage ? (
-                                <img src={profileImage} alt="Perfil" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                <img
+                                    src={profileImage}
+                                    alt="Perfil"
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
                             ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" viewBox="0 0 16 16">
-                                    <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM4 12s1-1 4-1 4 1 4 1-1 1-4 1-4-1-4-1zm4-9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
-                                </svg>
+                                <i
+                                    className="fas fa-user"
+                                    style={{ fontSize: "min(80px, 10vw)", color: "#fef9c3" }}
+                                    aria-hidden="true"
+                                ></i>
                             )}
                         </div>
 
                         {/* Input para subir foto */}
                         <input type="file" accept="image/*" onChange={handleChangePhoto} style={{ display: "none" }} id="fileInput" />
-                        <button onClick={() => document.getElementById("fileInput").click()} style={buttonStyle}>
+                        <button
+                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
+                            onClick={() => document.getElementById("fileInput").click()}
+                            style={buttonStyle}>
                             Cambiar Foto
                         </button>
                     </div>

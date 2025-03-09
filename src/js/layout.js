@@ -6,6 +6,7 @@ import { Home } from "./views/home.jsx";
 import Login from "./views/login.jsx";
 import Profile from "./views/profile.jsx";  
 import Reservation from "./views/reservation.jsx";
+import Destination from "./views/destination.jsx";  
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar.jsx";
@@ -27,6 +28,7 @@ const Layout = () => {
 						<Route path="/login" element={<Login />} />
 						<Route path="/profile" element={<Profile />} /> 
 						<Route path="/reservation" element={<Reservation />} /> 
+						<Route path="/destination" element={<Destination />} /> 
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />
