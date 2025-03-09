@@ -7,8 +7,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			addToken: (tk) =>{
 				setStore({token:tk})
 				localStorage.setItem("token",JSON.stringify(tk))
-				// console.log(getStore().token)
-				console.log(localStorage.getItem("token"))
 			},
  			close: () =>{
 				setStore({

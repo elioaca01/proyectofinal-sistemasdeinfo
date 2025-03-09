@@ -16,7 +16,7 @@ export const Navbar = () => {
 					<Link to='/' className="text-decoration-none">
 						<span  className="text-custom-green text-decoration-none" >Destino</span >
 					</Link>
-					<Link to='/' className="text-decoration-none">
+					<Link to='/reservation' className="text-decoration-none">
 						<span  className="text-custom-green text-decoration-none" >Reservación</span >
 					</Link>
 					<Link to='/' className="text-decoration-none">
