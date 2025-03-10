@@ -4,12 +4,12 @@ import { useNavigate } from "react-router-dom";
 const Destination = () => {
   const navigate = useNavigate();
 
-  const goToHome = () => {
-    navigate("/home");
+  const goToForum = () => {
+    navigate("/forum");
   };
 
   const goToReservations = () => {
-    navigate("/home");
+    navigate("/reservation");
   };
 
   return (
@@ -116,9 +116,18 @@ const Destination = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: "20px",
                   fontWeight: "bold",
-                  letterSpacing: "1px"
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out"
                 }}
-                onClick={goToHome}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#fbfada";
+                  e.target.style.color = "#333";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#fbfada";
+                }}
+                onClick={goToForum}
               >
                 Ver más
               </button>
@@ -251,9 +260,18 @@ const Destination = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: "20px",
                   fontWeight: "bold",
-                  letterSpacing: "1px"
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out"
                 }}
-                onClick={goToHome}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#fbfada";
+                  e.target.style.color = "#333";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#fbfada";
+                }}
+                onClick={goToForum}
               >
                 Ver más
               </button>
@@ -386,9 +404,18 @@ const Destination = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: "20px",
                   fontWeight: "bold",
-                  letterSpacing: "1px"
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out"
                 }}
-                onClick={goToHome}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#fbfada";
+                  e.target.style.color = "#333";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#fbfada";
+                }}
+                onClick={goToForum}
               >
                 Ver más
               </button>
@@ -522,9 +549,18 @@ const Destination = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: "20px",
                   fontWeight: "bold",
-                  letterSpacing: "1px"
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out"
                 }}
-                onClick={goToHome}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#fbfada";
+                  e.target.style.color = "#333";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#fbfada";
+                }}
+                onClick={goToForum}
               >
                 Ver más
               </button>
@@ -657,9 +693,18 @@ const Destination = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: "20px",
                   fontWeight: "bold",
-                  letterSpacing: "1px"
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out"
                 }}
-                onClick={goToHome}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#fbfada";
+                  e.target.style.color = "#333";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#fbfada";
+                }}
+                onClick={goToForum}
               >
                 Ver más
               </button>
@@ -793,9 +838,18 @@ const Destination = () => {
                   fontFamily: "'Montserrat', sans-serif",
                   fontSize: "20px",
                   fontWeight: "bold",
-                  letterSpacing: "1px"
+                  letterSpacing: "1px",
+                  transition: "all 0.2s ease-in-out"
                 }}
-                onClick={goToHome}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = "#fbfada";
+                  e.target.style.color = "#333";
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = "transparent";
+                  e.target.style.color = "#fbfada";
+                }}
+                onClick={goToForum}
               >
                 Ver más
               </button>

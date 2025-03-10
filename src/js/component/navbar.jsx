@@ -68,14 +68,14 @@ export const Navbar = () => {
 						Reservación
 					</Link>
 					<Link
-						to="/"
+						to="/forum"
 						className="text-custom-green text-decoration-none link-hover"
 						style={{ fontSize: "2rem" }}
 					>
 						Foro
 					</Link>
 					<Link
-						to="/foro"
+						to="/"
 						className="text-custom-green text-decoration-none link-hover"
 						style={{ fontSize: "2rem" }}
 					>
