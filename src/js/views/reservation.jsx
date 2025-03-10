@@ -1,5 +1,5 @@
 import React from "react"
-
+import { PaypalButton } from "../component/paypalButton.jsx";
 
 const Reservation = () => {
     return (
@@ -50,6 +50,7 @@ const Reservation = () => {
                                     <button type="button" class="btn bg-custom-green text-white ">Reservar</button>
                                 </div>
                             </form>
+                            <PaypalButton/>
                         </div>
                     </div>
                 </div>
