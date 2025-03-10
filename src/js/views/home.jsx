@@ -40,7 +40,7 @@ export const Home = () => {
 					<div className="w-100 d-flex justify-content-center "
 						style={{ position: 'absolute', bottom: '20px' }}>
 						<input className="px-4 py-2 rounded-lg bg-custom-green"
-							style={{ width: '40%', height: '50px', color: '50px' }}
+							style={{ width: '40%', height: '50px', color: '#FFFFFF' }}
 							placeholder="Buscar por..."
 							type="text" />
 					</div>

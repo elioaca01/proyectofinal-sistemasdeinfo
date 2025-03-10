@@ -1,48 +1,50 @@
 import React, { useState, useEffect } from "react";
 import getState from "./flux.js";
 
-// Don't change, here is where we initialize our context, by default it's just going to be null.
+// Inicializa el contexto
 export const Context = React.createContext(null);
 
-// This function injects the global store to any view/component where you want to use it, we will inject the context to layout.js, you can see it here:
-// https://github.com/4GeeksAcademy/react-hello-webapp/blob/master/src/js/layout.js#L35
-const injectContext = PassedComponent => {
-	const StoreWrapper = props => {
-		//this will be passed as the contenxt value
-		const [state, setState] = useState(
-			getState({
-				getStore: () => state.store,
-				getActions: () => state.actions,
-				setStore: updatedStore =>
-					setState({
-						store: Object.assign(state.store, updatedStore),
-						actions: { ...state.actions }
-					})
-			})
-		);
+// Función para inyectar el contexto
+const injectContext = (PassedComponent) => {
+    const StoreWrapper = (props) => {
+        // Estado que se pasará como valor del contexto
+        const [state, setState] = useState(
+            getState({
+                getStore: () => state.store,
+                getActions: () => state.actions,
+                setStore: (updatedStore) =>
+                    setState({
+                        store: Object.assign(state.store, updatedStore),
+                        actions: { ...state.actions },
+                    }),
+            })
+        );
 
-		useEffect(() => {
-			/**
-			 * EDIT THIS!
-			 * This function is the equivalent to "window.onLoad", it only runs once on the entire application lifetime
-			 * you should do your ajax requests or fetch api requests here. Do not use setState() to save data in the
-			 * store, instead use actions, like this:
-			 *
-			 * state.actions.loadSomeData(); <---- calling this function from the flux.js actions
-			 *
-			 **/
-		}, []);
+        // Función para establecer el usuario en el estado
+        const setUser  = (user) => {
+            setState((prevState) => ({
+                ...prevState,
+                store: { ...prevState.store, user }, // Actualiza el estado del usuario en el contexto
+            }));
+        };
 
-		// The initial value for the context is not null anymore, but the current state of this component,
-		// the context will now have a getStore, getActions and setStore functions available, because they were declared
-		// on the state of this component
-		return (
-			<Context.Provider value={state}>
-				<PassedComponent {...props} />
-			</Context.Provider>
-		);
-	};
-	return StoreWrapper;
+        // Función para limpiar el usuario (por ejemplo, al cerrar sesión)
+        const clearUser  = () => {
+            setState((prevState) => ({
+                ...prevState,
+                store: { ...prevState.store, user: null }, // Limpia el usuario
+            }));
+        };
+
+
+        // Proporciona el estado y las acciones al contexto
+        return (
+            <Context.Provider value={{ state, setUser , clearUser  }}>
+                <PassedComponent {...props} />
+            </Context.Provider>
+        );
+    };
+    return StoreWrapper;
 };
 
 export default injectContext;

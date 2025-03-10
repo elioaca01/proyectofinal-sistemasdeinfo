@@ -1,13 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { auth } from '../firebase'; // Asegúrate de importar auth desde tu archivo de configuración de Firebase
+import { onAuthStateChanged } from 'firebase/auth';
+import { Context } from '../store/appContext'; // Importa el contexto
 
 const Forum = () => {
+    const { store } = useContext(Context); // Obtén el estado del contexto
     const [posts, setPosts] = useState([]);
     const [newPost, setNewPost] = useState({ text: '', image: null });
+    const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
+
+    // Verificar el estado de autenticación del usuario
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser); // Actualiza el estado del usuario
+        });
+
+        return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
+    }, []);
 
     const handlePostSubmit = () => {
+        if (!user) {
+            alert("Debes iniciar sesión para publicar."); // Mensaje de alerta si no hay sesión
+            return;
+        }
+
         if (newPost.text || newPost.image) {
             const currentDate = new Date().toLocaleString();
-            const newPostData = { ...newPost, date: currentDate, comments: [], likes: 0 };
+            const newPostData = {
+                ...newPost,
+                date: currentDate,
+                user: user.displayName || user.email, // Mostrar el nombre o email del usuario
+                comments: [],
+                likes: 0,
+                likedBy: [] // Array para almacenar los IDs de los usuarios que han dado like
+            };
             setPosts([newPostData, ...posts]); // Agregar nuevo post al inicio
             setNewPost({ text: '', image: null });
         }
@@ -25,6 +51,10 @@ const Forum = () => {
     };
 
     const handleAddComment = (index, comment) => {
+        if (!user) {
+            alert("Debes iniciar sesión para comentar."); // Mensaje de alerta si no hay sesión
+            return;
+        }
         if (comment.trim() === '') return;
         const updatedPosts = [...posts];
         updatedPosts[index].comments.push(comment);
@@ -32,8 +62,21 @@ const Forum = () => {
     };
 
     const handleLike = (index) => {
+        if (!user) {
+            alert("Debes iniciar sesión para dar like."); // Mensaje de alerta si no hay sesión
+            return;
+        }
         const updatedPosts = [...posts];
-        updatedPosts[index].likes += 1;
+        const post = updatedPosts[index];
+
+        // Verificar si el usuario ya ha dado like
+        if (post.likedBy.includes(user.uid)) {
+            alert("Ya has dado like a esta publicación."); // Mensaje si ya ha dado like
+            return;
+        }
+
+        post.likes += 1; // Incrementar el contador de likes
+        post.likedBy.push(user.uid); // Agregar el ID del usuario al array de usuarios que han dado like
         setPosts(updatedPosts);
     };
 
@@ -76,6 +119,7 @@ const Forum = () => {
                     {posts.map((post, index) => (
                         <div key={index} id={`post-${index}`} style={{ maxWidth: '640px', margin: '16px auto', backgroundColor: '#fbfada', padding: '16px', borderRadius: '8px', border: '2px solid #2e4e1e' }}>
                             {post.image && <img src={post.image} alt="Imagen del post" style={{ borderRadius: '8px', width: '100%' }} />}
+                            <p><strong>{post.user}</strong> publicó:</p>
                             <p>{post.text}</p>
                             <p style={{ fontSize: '12px', color: '#888' }}>Publicado el: {post.date}</p>
 
