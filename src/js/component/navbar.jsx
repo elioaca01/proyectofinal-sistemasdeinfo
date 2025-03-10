@@ -105,26 +105,15 @@ export const Navbar = () => {
 							</>
 						) : (
 							<>
-								{store.token ? (
-									<div className="d-flex align-items-center gap-4">
-										<Link to="/">
-											<button
-												className="btn btn-success bg-custom-green"
-												onClick={() => actions.close()}
-											>
-												Cerrar sesión
-											</button>
-										</Link>
-									</div>
-								) : (
-									<div className="d-flex align-items-center gap-4">
-										<Link to="/login">
-											<button className="btn btn-success bg-custom-green text-white">
-												Iniciar sesión
-											</button>
-										</Link>
-									</div>
-								)}
+						
+								<div className="d-flex align-items-center mb-4 gap-4">
+									<Link to="/login">
+										<button className="btn btn-success bg-custom-green text-white">
+											Iniciar sesión
+										</button>
+									</Link>
+								</div>
+	
 							</>
 						)}
 					</div>
