@@ -85,7 +85,7 @@ export const Navbar = () => {
 
 				{/* Sección de botones */}
 				{!isLoginView && (
-					<div className="d-flex align-items-center gap-4">
+					<div className="d-flex mb-4 align-items-center gap-4">
 						{user ? (
 							<>
 								{/* Mostrar botón Perfil solo si NO estás en /profile */}
