@@ -1,13 +1,27 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import getState from "./flux.js";
 
-// Inicializa el contexto
 export const Context = React.createContext(null);
 
-// Función para inyectar el contexto
 const injectContext = (PassedComponent) => {
     const StoreWrapper = (props) => {
-        // Estado que se pasará como valor del contexto
+        // Definición de funciones antes del uso en actions
+        const setUser = (user) => {
+            setState((prevState) => ({
+                ...prevState,
+                store: { ...prevState.store, user },
+            }));
+            localStorage.setItem("user", JSON.stringify(user)); 
+        };
+
+        const clearUser = () => {
+            setState((prevState) => ({
+                ...prevState,
+                store: { ...prevState.store, user: null },
+            }));
+            localStorage.removeItem("user"); 
+        };
+
         const [state, setState] = useState(
             getState({
                 getStore: () => state.store,
@@ -15,31 +29,21 @@ const injectContext = (PassedComponent) => {
                 setStore: (updatedStore) =>
                     setState({
                         store: Object.assign(state.store, updatedStore),
-                        actions: { ...state.actions },
+                        actions: {
+                            ...state.actions,
+                            setUser,     
+                            clearUser,   
+                        },
                     }),
             })
         );
 
-        // Función para establecer el usuario en el estado
-        const setUser  = (user) => {
-            setState((prevState) => ({
-                ...prevState,
-                store: { ...prevState.store, user }, // Actualiza el estado del usuario en el contexto
-            }));
-        };
+        // Log para verificar si setUser es una función
+        console.log("Context Actions:", state.actions);
+        console.log("setUser es una función:", typeof state.actions.setUser === "function");
 
-        // Función para limpiar el usuario (por ejemplo, al cerrar sesión)
-        const clearUser  = () => {
-            setState((prevState) => ({
-                ...prevState,
-                store: { ...prevState.store, user: null }, // Limpia el usuario
-            }));
-        };
-
-
-        // Proporciona el estado y las acciones al contexto
         return (
-            <Context.Provider value={{ state, setUser , clearUser  }}>
+            <Context.Provider value={{ state, actions: state.actions }}>
                 <PassedComponent {...props} />
             </Context.Provider>
         );

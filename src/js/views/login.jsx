@@ -12,7 +12,7 @@ import { auth } from "../firebase.js";
 import "../../styles/login.css";
 
 const Login = () => {
-    const { actions } = useContext(Context); // Obtener las acciones del contexto
+    const { state, actions } = useContext(Context);
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
