@@ -9,6 +9,7 @@
 	"scripts": {
 		"start": "webpack-dev-server --config webpack.dev.js --host 0.0.0.0 --port 3000",
 		"build": "webpack --config webpack.prod.js",
+		"preview": "npx serve -s build",
 		"deploy": "node deploy-to-github.js"
 	},
 	"author": {
@@ -39,7 +40,7 @@
 		"babel-plugin-transform-class-properties": "^6.10.2",
 		"bc-console": "0.0.2",
 		"css-loader": "^6.5.1",
-		"dotenv-webpack": "^7.0.3",
+		"dotenv-webpack": "^7.1.1",
 		"envfile": "^6.17.0",
 		"error-overlay-webpack-plugin": "^1.0.0",
 		"eslint": "^8.4.0",
