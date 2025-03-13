@@ -7,11 +7,13 @@ import Login from "./views/login.jsx";
 import Profile from "./views/profile.jsx";  
 import Reservation from "./views/reservation.jsx";
 import Destination from "./views/destination.jsx";  
+import Information from "./views/information.jsx";
 import Forum from "./views/forum.jsx";  
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar.jsx";
 import { Footer } from "./component/footer.jsx";
+
 
 //create your first component
 const Layout = () => {
@@ -30,6 +32,7 @@ const Layout = () => {
 						<Route path="/profile" element={<Profile />} /> 
 						<Route path="/reservation" element={<Reservation />} /> 
 						<Route path="/destination" element={<Destination />} /> 
+						<Route path="/info" element={<Information />} /> 
 						<Route path="/forum" element={<Forum />} /> 
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>

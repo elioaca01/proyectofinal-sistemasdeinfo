@@ -75,7 +75,7 @@ export const Navbar = () => {
 						Foro
 					</Link>
 					<Link
-						to="/"
+						to="/info"
 						className="text-custom-green text-decoration-none link-hover"
 						style={{ fontSize: "2rem" }}
 					>
