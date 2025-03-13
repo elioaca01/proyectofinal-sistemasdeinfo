@@ -7,6 +7,9 @@ const Destination = () => {
   const goToForum = () => {
     navigate("/forum");
   };
+  const goToGallery = () => {
+    navigate("/gallery");
+  };
 
   const goToReservations = () => {
     navigate("/reservation");
@@ -127,7 +130,7 @@ const Destination = () => {
                   e.target.style.backgroundColor = "transparent";
                   e.target.style.color = "#fbfada";
                 }}
-                onClick={goToForum}
+                onClick={goToGallery}
               >
                 Ver más
               </button>
@@ -271,7 +274,7 @@ const Destination = () => {
                   e.target.style.backgroundColor = "transparent";
                   e.target.style.color = "#fbfada";
                 }}
-                onClick={goToForum}
+                onClick={goToGallery}
               >
                 Ver más
               </button>
@@ -415,7 +418,7 @@ const Destination = () => {
                   e.target.style.backgroundColor = "transparent";
                   e.target.style.color = "#fbfada";
                 }}
-                onClick={goToForum}
+                onClick={goToGallery}
               >
                 Ver más
               </button>
@@ -560,7 +563,7 @@ const Destination = () => {
                   e.target.style.backgroundColor = "transparent";
                   e.target.style.color = "#fbfada";
                 }}
-                onClick={goToForum}
+                onClick={goToGallery}
               >
                 Ver más
               </button>
@@ -704,7 +707,7 @@ const Destination = () => {
                   e.target.style.backgroundColor = "transparent";
                   e.target.style.color = "#fbfada";
                 }}
-                onClick={goToForum}
+                onClick={goToGallery}
               >
                 Ver más
               </button>
@@ -849,7 +852,7 @@ const Destination = () => {
                   e.target.style.backgroundColor = "transparent";
                   e.target.style.color = "#fbfada";
                 }}
-                onClick={goToForum}
+                onClick={goToGallery}
               >
                 Ver más
               </button>
