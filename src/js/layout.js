@@ -9,6 +9,7 @@ import Reservation from "./views/reservation.jsx";
 import Destination from "./views/destination.jsx";  
 import Information from "./views/information.jsx";
 import Forum from "./views/forum.jsx";  
+import Gallery from "./views/gallery.jsx";  
 import injectContext from "./store/appContext";
 
 import { Navbar } from "./component/navbar.jsx";
@@ -34,6 +35,7 @@ const Layout = () => {
 						<Route path="/destination" element={<Destination />} /> 
 						<Route path="/info" element={<Information />} /> 
 						<Route path="/forum" element={<Forum />} /> 
+						<Route path="/gallery" element={<Gallery />} /> 
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />
