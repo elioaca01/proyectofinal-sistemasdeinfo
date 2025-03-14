@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { auth } from '../firebase'; // Asegúrate de importar auth desde tu archivo de configuración de Firebase
-import { onAuthStateChanged } from 'firebase/auth';
+//import { auth } from '../firebase'; // Asegúrate de importar auth desde tu archivo de configuración de Firebase
+// import { onAuthStateChanged } from 'firebase/auth';
 import { Context } from '../store/appContext'; // Importa el contexto
 
 const Forum = () => {
@@ -10,13 +10,13 @@ const Forum = () => {
     const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
 
     // Verificar el estado de autenticación del usuario
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser); // Actualiza el estado del usuario
-        });
+    // useEffect(() => {
+    //     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    //         setUser(currentUser); // Actualiza el estado del usuario
+    //     });
 
-        return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
-    }, []);
+    //     return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
+    // }, []);
 
     const handlePostSubmit = () => {
         if (!user) {
