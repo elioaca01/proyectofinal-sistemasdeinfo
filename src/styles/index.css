@@ -1,3 +1,66 @@
 /* 
     General Styles
 */
+.banner {
+    width: 100%; /* El banner ocupa todo el ancho del contenedor */
+    height: 300px; /* Altura deseada para el banner */
+    /* background-image: url('tu-imagen.jpg'); */
+    background-size: cover; /* La imagen cubre todo el contenedor, recortando si es necesario */
+    background-position: center; /* Centra la imagen dentro del contenedor */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+  }
+
+.contenedor-imagen {
+    position: relative; /* Establece el contexto de posicionamiento */
+    display: inline-block; /* O block, dependiendo de tus necesidades */
+  }
+  
+  .contenedor-imagen img {
+    display: block; /* Asegura que la imagen ocupe todo el ancho */
+  }
+  
+  .texto-centrado {
+    position: absolute; /* Permite posicionamiento absoluto */
+    top: 50%; /* Posiciona el borde superior al 50% */
+    left: 50%; /* Posiciona el borde izquierdo al 50% */
+    transform: translate(-50%, -50%); /* Centra el elemento exactamente */
+    color: white; /* Color del texto */
+    font-size: 24px; /* Tamaño del texto */
+    /* Otros estilos para el texto */
+  }
+
+.imagen{
+    width: 400px;
+}
+
+.width-card{
+    width: 500px;
+}
+
+.color-red{
+    color: red;
+}
+
+.color-purple{
+    color:purple
+}
+
+.color-yellow{
+    color: yellow;
+}
+
+.color-green{
+    color: greenyellow;
+}
+
+.icono-message{
+    font-size: 130px;
+}
+
+.height{
+    height: 480px;
+}
+
+.height2{
+    height: 500px;
+}
