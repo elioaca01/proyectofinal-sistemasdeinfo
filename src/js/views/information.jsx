@@ -173,11 +173,3 @@ const Information = () =>{
 }
 
 export default Information;
-{/* <div className="d-flex flex-column align-items-center p-4">
-                            <img src="https://res.cloudinary.com/dntc8trob/image/upload/v1741803523/avipic_jhfjmo.jpg" className="img-fluid " alt="img" />
-                            </div> */}
-
-                            
-                            {/* <div className="d-flex flex-column align-items-center p-4">
-                            <img src="https://res.cloudinary.com/dntc8trob/image/upload/v1741803523/avipic_jhfjmo.jpg" className="img-fluid" alt="" />
-                            </div> */}
