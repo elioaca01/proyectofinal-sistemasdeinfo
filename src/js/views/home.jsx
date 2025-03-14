@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated, logout } from "../auth.js";  // ✔️ Importa funciones de autenticación
-import { auth } from "../firebase.js";
 import "../../styles/home.css";
 
 export const Home = () => {
