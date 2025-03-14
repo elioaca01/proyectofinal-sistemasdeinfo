@@ -1,17 +1,17 @@
 import React from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+// import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 
 
 
-export const PaypalButton = (props)  =>{
+export const PaypalButton = (props) => {
     const initialOptions = {
         clientId: process.env.PAYPAL_CLIENT_ID,
         currency: "USD",
         intent: "capture",
     };
 
-    function createOrder(data,actions) {
+    function createOrder(data, actions) {
         // return fetch("/my-server/create-paypal-order", {
         //     method: "POST",
         //     headers: {
@@ -44,8 +44,8 @@ export const PaypalButton = (props)  =>{
     function onApprove(data) {
         console.log(data)
     }
-    
-    return(
+
+    return (
         <div className="container d-flex flex-column justify-content-center">
             <h1>Seleccione metodo:</h1>
             <PayPalScriptProvider options={initialOptions}>
