@@ -1,14 +1,14 @@
 import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
-// import {
-//     createUserWithEmailAndPassword, // Corregido aquí
-//     signInWithEmailAndPassword,
-//     GoogleAuthProvider,
-//     FacebookAuthProvider,
-//     signInWithPopup
-// } from "firebase/auth";
-// import { auth } from "../firebase.js";
+import {
+    createUserWithEmailAndPassword, 
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    FacebookAuthProvider,
+    signInWithPopup
+} from "firebase/auth";
+import { auth } from "../firebase.js";
 import "../../styles/login.css";
 
 const Login = () => {
