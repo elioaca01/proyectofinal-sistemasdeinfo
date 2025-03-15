@@ -309,7 +309,7 @@ const Destination = () => {
 
           {/* Columna para la descripción y botón de reserva */}
           <div className="col-md-3 d-flex flex-column justify-content-between">
-            <p className
+            <p 
               style={{
                 fontFamily: "'Montserrat', sans-serif",
                 fontSize: "20px",

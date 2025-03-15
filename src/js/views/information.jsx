@@ -34,15 +34,15 @@ const Information = () =>{
                                     <img src="https://res.cloudinary.com/dntc8trob/image/upload/v1741803523/avipic_jhfjmo.jpg" className="img-fluid imagen  pt-4" alt="img" />
                                     <div className="container">
                                         <div className="d-flex">
-                                            <i class="fa-solid fa-caret-up fs-1 color-purple"></i>
+                                            <i className="fa-solid fa-caret-up fs-1 color-purple"></i>
                                             <p className="fs-2 ms-3 yellow">Pico el Avila</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-up-long fs-1 yellow"></i>
+                                            <i className="fa-solid fa-up-long fs-1 yellow"></i>
                                             <p className="fs-3 ms-3 yellow">2.250 m.s.n.m.</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-globe yellow fs-1"></i>
+                                            <i className="fa-solid fa-globe yellow fs-1"></i>
                                             <p className="fs-5 ms-3 yellow">Es un pico en la parte central, ubicada en el corazón del parque, siendo la más famosa.</p>
                                         </div>
                                     </div>
@@ -54,15 +54,15 @@ const Information = () =>{
                                     <img src="https://res.cloudinary.com/dntc8trob/image/upload/v1741804512/naigua_u21zwa.jpg" className="rounded imagen pt-4" alt="" />
                                     <div className="container">
                                         <div className="d-flex">
-                                            <i class="fa-solid fa-caret-up fs-1 color-red"></i>
+                                            <i className="fa-solid fa-caret-up fs-1 color-red"></i>
                                             <p className="fs-2 ms-3 yellow">Pico Naiguata</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-up-long fs-1 yellow"></i>
+                                            <i className="fa-solid fa-up-long fs-1 yellow"></i>
                                             <p className="fs-3 ms-3 yellow">2.765 m.s.n.m.</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-globe yellow fs-1"></i>
+                                            <i className="fa-solid fa-globe yellow fs-1"></i>
                                             <p className="fs-5 ms-3 yellow">El nombre del Naiguatá proviene de un poderoso cacique, es el pico más alto.</p>
                                         </div>
                                     </div>
@@ -75,15 +75,15 @@ const Information = () =>{
                                     <img src="https://res.cloudinary.com/dntc8trob/image/upload/v1741833818/oriental_ygecmw.jpg" className="img-fluid imagen  pt-4" alt="img" />
                                     <div className="container">
                                         <div className="d-flex">
-                                            <i class="fa-solid fa-caret-up fs-1 color-yellow"></i>
+                                            <i className="fa-solid fa-caret-up fs-1 color-yellow"></i>
                                             <p className="fs-2 ms-3 yellow">Pico Oriental</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-up-long fs-1 yellow"></i>
+                                            <i className="fa-solid fa-up-long fs-1 yellow"></i>
                                             <p className="fs-3 ms-3 yellow">2.640 m.s.n.m.</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-globe yellow fs-1"></i>
+                                            <i className="fa-solid fa-globe yellow fs-1"></i>
                                             <p className="fs-5 ms-3 yellow">Es el segundo pico más alto del parque, donde además se encuentra la Cruz de palmeros.</p>
                                         </div>
                                     </div>
@@ -95,15 +95,15 @@ const Information = () =>{
                                     <img src="https://res.cloudinary.com/dntc8trob/image/upload/v1741833745/occi_z6taht.jpg" className="rounded imagen pt-4" alt="" />
                                     <div className="container">
                                         <div className="d-flex">
-                                            <i class="fa-solid fa-caret-up fs-1 color-green"></i>
+                                            <i className="fa-solid fa-caret-up fs-1 color-green"></i>
                                             <p className="fs-2 ms-3 yellow">Pico Occidental</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-up-long fs-1 yellow"></i>
+                                            <i className="fa-solid fa-up-long fs-1 yellow"></i>
                                             <p className="fs-3 ms-3 yellow">2.480 m.s.n.m.</p>
                                         </div>
                                         <div className="d-flex align-items-start">
-                                            <i class="fa-solid fa-globe yellow fs-1"></i>
+                                            <i className="fa-solid fa-globe yellow fs-1"></i>
                                             <p className="fs-5 ms-3 yellow">Es el tercer pico más alto del parque, se puede ver el mar y el Hotel Humboldt.</p>
                                         </div>
                                     </div>
@@ -114,7 +114,7 @@ const Information = () =>{
                         <div className="container mt-5">
                             <div className="row p-2">
                                 <div className="col-12 col-md-3 d-flex justify-content-center">
-                                    <i class="fa-solid fa-message icono-message custom-green"></i>
+                                    <i className="fa-solid fa-message icono-message custom-green"></i>
                                 </div>
                                 <div className="col-12 col-md-9 d-flex flex-column justify-content-start">
                                     <h1>SABIAS QUE...</h1>

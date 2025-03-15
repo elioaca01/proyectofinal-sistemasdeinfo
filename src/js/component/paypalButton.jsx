@@ -1,12 +1,12 @@
 import React from "react";
-// import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 
 
 
 
 export const PaypalButton = (props) => {
     const initialOptions = {
-        clientId: process.env.PAYPAL_CLIENT_ID,
+        clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID,
         currency: "USD",
         intent: "capture",
     };
