@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { isAuthenticated } from "../auth.js";
 
 const Destination = () => {
   const navigate = useNavigate();
@@ -12,7 +13,12 @@ const Destination = () => {
   };
 
   const goToReservations = () => {
-    navigate("/reservation");
+    if (isAuthenticated()) {
+      navigate("/reservation");
+    } else {
+      alert("Debes iniciar sesión para hacer una reservación.");
+      navigate("/login");
+    }
   };
 
   return (
@@ -309,7 +315,7 @@ const Destination = () => {
 
           {/* Columna para la descripción y botón de reserva */}
           <div className="col-md-3 d-flex flex-column justify-content-between">
-            <p 
+            <p
               style={{
                 fontFamily: "'Montserrat', sans-serif",
                 fontSize: "20px",

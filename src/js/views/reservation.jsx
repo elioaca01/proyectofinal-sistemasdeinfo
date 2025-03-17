@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { PaypalButton } from "../component/paypalButton.jsx";
+import React, { useState, useEffect } from "react";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { db } from "../../js/firebase.js";
 import { collection, addDoc } from "firebase/firestore";
 
@@ -14,16 +14,21 @@ const Reservation = () => {
         ruta: "",
     });
 
+    const [pagoExitoso, setPagoExitoso] = useState(false);
+    const [paypalReady, setPaypalReady] = useState(false);
+
+    useEffect(() => {
+        setPaypalReady(true);  // Confirma que PayPal se ha cargado
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        // Restricción para número de personas (máximo 10)
         if (name === "numeroPersonas" && (value < 1 || value > 10)) {
             alert("El número de personas debe ser entre 1 y 10.");
             return;
         }
 
-        // Restricción para la fecha (no se permiten fechas pasadas)
         if (name === "fecha") {
             const today = new Date().toISOString().split("T")[0];
             if (value < today) {
@@ -41,7 +46,11 @@ const Reservation = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validación para asegurarse de que se seleccionó una ruta
+        if (!pagoExitoso) {
+            alert("Debes realizar el pago antes de reservar.");
+            return;
+        }
+
         if (!reserva.ruta) {
             alert("Por favor, selecciona una ruta antes de reservar.");
             return;
@@ -61,11 +70,14 @@ const Reservation = () => {
                 fecha: "",
                 ruta: "",
             });
+
+            setPagoExitoso(false);
         } catch (error) {
             console.error("❌ Error al guardar la reserva:", error);
             alert("Hubo un error al guardar la reserva.");
         }
     };
+
     return (
         <>
             <div className="container-fluid bg-custom-green p-4">
@@ -119,20 +131,55 @@ const Reservation = () => {
                                 </div>
                                 <div className="form-floating mb-3">
                                     <input type="number" className="form-control" name="numeroPersonas"
-                                        placeholder="Número de Personas" value={reserva.numeroPersonas}
-                                        onChange={handleChange} required />
-                                    <label>Número de Personas</label>
+                                        placeholder="Número de Personas"
+                                        value={reserva.numeroPersonas}
+                                        onChange={handleChange}
+                                        min="1" max="10" required />
+                                    <label>Número de Personas (Máx 10)</label>
                                 </div>
                                 <div className="form-floating mb-3">
                                     <input type="date" className="form-control" name="fecha"
-                                        value={reserva.fecha} onChange={handleChange} required />
+                                        value={reserva.fecha} onChange={handleChange} required
+                                        min={new Date().toISOString().split("T")[0]} />
                                     <label>Fecha</label>
                                 </div>
-                                <div className="form-floating d-flex justify-content-center mb-3">
-                                    <button type="submit" className="btn bg-custom-green text-white">Reservar</button>
+
+                                {/* 🟢 PAYPAL */}
+                                {paypalReady && (
+                                    <PayPalScriptProvider options={{ "client-id": "TAbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
+                                        <div className="mb-3 d-flex justify-content-center">
+                                            <PayPalButtons
+                                                style={{ layout: "vertical" }}
+                                                createOrder={(data, actions) => {
+                                                    return actions.order.create({
+                                                        purchase_units: [
+                                                            { amount: { value: "10.00" } }
+                                                        ],
+                                                    });
+                                                }}
+                                                onApprove={(data, actions) => {
+                                                    return actions.order.capture().then((details) => {
+                                                        alert("Pago exitoso: " + details.payer.name.given_name);
+                                                        setPagoExitoso(true);
+                                                    });
+                                                }}
+                                                onError={() => {
+                                                    alert("Hubo un error con el pago.");
+                                                    setPagoExitoso(false);
+                                                }}
+                                            />
+                                        </div>
+                                    </PayPalScriptProvider>
+                                )}
+
+                                <div className="form-floating d-flex justify-content-center mt-3">
+                                    <button type="submit" className="btn bg-custom-green text-white"
+                                        disabled={!pagoExitoso}>
+                                        Reservar
+                                    </button>
                                 </div>
+
                             </form>
-                            <PaypalButton />
                         </div>
                     </div>
                 </div>

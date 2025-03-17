@@ -2,17 +2,18 @@ import React, { useState, useContext } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import {
-    createUserWithEmailAndPassword, 
+    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     GoogleAuthProvider,
     FacebookAuthProvider,
     signInWithPopup
 } from "firebase/auth";
-import { auth } from "../firebase.js";
+import { auth, db } from "../firebase.js";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import "../../styles/login.css";
 
 const Login = () => {
-    const { state, actions } = useContext(Context);
+    const { actions } = useContext(Context);
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -56,13 +57,32 @@ const Login = () => {
 
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            actions.setUser(userCredential.user); // Establecer el usuario en el contexto
-            navigate("/");  // Ir al Home después de registrarse
+            const user = userCredential.user;
+
+            if (!user.uid) {
+                throw new Error("No se obtuvo el UID del usuario.");
+            }
+
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                name: name,
+                lastName: lastName,
+                email: email,
+                phone: phone,
+                username: username,
+                role: "Excursionista"
+            });
+
+            actions.setUser(user);
+            navigate("/");
         } catch (error) {
-            console.error("Error al registrar usuario:", error.message);
-            setError("Error al registrar el usuario. Intenta nuevamente.");
+            console.error("🚨 Error detectado:", error.code, error.message);
+            setError(`Error: ${error.message}`);
         }
+
     };
+
+
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -74,26 +94,106 @@ const Login = () => {
         }
 
         try {
+            console.log("🔥 Intentando iniciar sesión con:", email);
+
+            // Iniciar sesión con Firebase Authentication
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            actions.setUser(userCredential.user); // Establecer el usuario en el contexto
-            navigate("/");  // Ir al Home después de iniciar sesión
+            const user = userCredential.user;
+
+            console.log("✅ Usuario autenticado:", user.uid);
+
+            // Obtener la información del usuario en Firestore
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                console.log("📌 Datos del usuario en Firestore:", userData);
+
+                // Guardar usuario y rol en el contexto global
+                actions.setUser({
+                    uid: user.uid,
+                    email: user.email,
+                    role: userData.role,
+                    name: userData.name,
+                    lastName: userData.lastName
+                });
+
+                console.log("✅ Usuario guardado en contexto con rol:", userData.role);
+
+                // Redirigir según el rol
+                if (userData.role === "Admin") {
+                    console.log("🚀 Redirigiendo a Admin Dashboard...");
+                    navigate("/admin-dashboard");
+                } else {
+                    console.log("🏠 Redirigiendo a Home...");
+                    navigate("/");
+                }
+            } else {
+                console.error("🚨 No se encontró el usuario en Firestore.");
+                setError("Error: No se encontraron los datos del usuario.");
+            }
         } catch (error) {
-            console.error("Error al iniciar sesión:", error.message);
-            setError("Error al iniciar sesión. Verifica tus credenciales.");
+            console.error("🚨 Error al iniciar sesión:", error.code, error.message);
+
+            if (error.code === "auth/user-not-found") {
+                setError("Usuario no encontrado. Verifica tus credenciales.");
+            } else if (error.code === "auth/wrong-password") {
+                setError("Contraseña incorrecta. Intenta nuevamente.");
+            } else {
+                setError("Error al iniciar sesión. Intenta más tarde.");
+            }
         }
     };
 
+
     const handleGoogleLogin = async () => {
         const provider = new GoogleAuthProvider();
+
         try {
             const result = await signInWithPopup(auth, provider);
-            actions.setUser(result.user); // Establecer el usuario en el contexto
-            navigate("/");  // Ir al Home después de iniciar sesión con Google
+            const user = result.user;
+
+            console.log("✅ Usuario autenticado con Google:", user);
+
+            // Referencia al documento del usuario en Firestore
+            const userDocRef = doc(db, "users", user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (!userDocSnap.exists()) {
+                // Si el usuario no existe en Firestore, lo creamos con rol "Excursionista"
+                console.log("🆕 Creando nuevo usuario en Firestore...");
+                await setDoc(userDocRef, {
+                    uid: user.uid,
+                    name: user.displayName || "",
+                    email: user.email,
+                    phone: user.phoneNumber || "",
+                    username: user.displayName ? user.displayName.replace(/\s+/g, "").toLowerCase() : "",
+                    role: "Excursionista" // 🔥 Rol por defecto
+                });
+                console.log("✅ Usuario guardado en Firestore con rol Excursionista.");
+            } else {
+                console.log("📌 Usuario ya registrado en Firestore.");
+            }
+
+            // Obtener los datos actualizados del usuario y guardarlos en el contexto
+            const updatedUserDoc = await getDoc(userDocRef);
+            const userData = updatedUserDoc.data();
+
+            actions.setUser(userData);
+
+            // Redirigir según el rol del usuario
+            if (userData.role === "Admin") {
+                navigate("/admin-dashboard");
+            } else {
+                navigate("/");
+            }
         } catch (error) {
-            console.error("Error con Google:", error.message);
+            console.error("🚨 Error con Google:", error.message);
             setError("Error al iniciar sesión con Google.");
         }
     };
+
 
     const handleFacebookLogin = async () => {
         const provider = new FacebookAuthProvider();
