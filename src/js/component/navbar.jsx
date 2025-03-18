@@ -52,7 +52,10 @@ export const Navbar = () => {
 					<img
 						alt="Logo de la Universidad Metropolitana"
 						className="logo-universidad pb-1"
-						style={{ marginTop: "-25px" }}
+						style={{
+							marginTop: "-25px",
+							marginLeft: "-70px",
+						}}
 						src="https://res.cloudinary.com/dntc8trob/image/upload/v1740263475/Logo-unimet-6-removebg-preview_x7gf7b.png"
 					/>
 					<Link to="/">
@@ -68,17 +71,17 @@ export const Navbar = () => {
 				{/* Contenedor para los enlaces de navegación */}
 				<nav
 					className="d-none d-md-flex align-items-center gap-5 fw-bold"
-					style={{ marginLeft: "100px", marginRight: "100px", marginTop: "-25px" }}
+					style={{ marginLeft: "30px", marginRight: "50px", marginTop: "-25px", fontSize: "1.7rem" }}
 				>
-					<Link to="/destination" className="text-custom-green text-decoration-none link-hover" style={{ fontSize: "2rem" }}>
+					<Link to="/destination" className="text-custom-paragraph text-decoration-none link-hover" >
 						Destino
 					</Link>
 
 					{/* Si el usuario es admin, mostrar "Reservas", si no, "Reservación" */}
 					{user && (
 						<Link to={isAdmin ? "/manage-reservations" : "/reservation"}
-							className="text-custom-green text-decoration-none link-hover"
-							style={{ fontSize: "2rem" }}
+							className=" text-custom-paragraph text-decoration-none link-hover"
+
 						>
 							{isAdmin ? "Reservas" : "Reservación"}
 						</Link>
@@ -91,33 +94,46 @@ export const Navbar = () => {
 						</Link>
 					)}
 
-					<Link to="/forum" className="text-custom-green text-decoration-none link-hover" style={{ fontSize: "2rem" }}>
+					<Link to="/forum" className="text-custom-paragraph text-decoration-none link-hover"
+					>
 						Foro
 					</Link>
-					<Link to="/info" className="text-custom-green text-decoration-none link-hover" style={{ fontSize: "2rem" }}>
+					<Link to="/info" className="text-custom-paragraph text-decoration-none link-hover"
+					>
 						Información
 					</Link>
+					<Link to="/gallery" className="text-custom-paragraph text-decoration-none link-hover"
+					>
+						Galería
+					</Link>
+
 				</nav>
 
 				{/* Sección de botones */}
 				{!isLoginView && (
-					<div className="d-flex mb-4 align-items-center gap-4">
+					<div className="d-flex mb-4 align-items-center gap-4"
+						style={{ marginLeft: "5px", marginRight: "-50px", marginTop: "-10px" }}>
 						{user ? (
 							<>
 								{/* Mostrar botón Perfil solo si NO estás en /profile */}
 								{location.pathname !== "/profile" && (
 									<Link to="/profile">
-										<button className="btn btn-success bg-custom-green text-white">Perfil</button>
+										<button className="btn btn-success bg-custom-green text-white text-custom-paragraph2"
+											style={{ fontSize: "1rem" }}>
+											Perfil</button>
 									</Link>
 								)}
-								<button onClick={handleLogout} className="btn btn-danger text-white">
+								<button onClick={handleLogout} className="btn btn-danger text-white text-custom-paragraph2"
+									style={{ fontSize: "1rem" }}>
 									Cerrar sesión
 								</button>
 							</>
 						) : (
 							<div className="d-flex align-items-center mb-4 gap-4">
 								<Link to="/login">
-									<button className="btn btn-success bg-custom-green text-white">Iniciar sesión</button>
+									<button className="btn btn-success bg-custom-green text-white text-custom-paragraph2"
+										style={{ fontSize: "1rem" }}
+									>Iniciar sesión</button>
 								</Link>
 							</div>
 						)}
