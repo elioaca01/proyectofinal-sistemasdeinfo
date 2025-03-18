@@ -12,35 +12,54 @@ const Reservation = () => {
         numeroPersonas: "",
         fecha: "",
         ruta: "",
+        guiaUid: "", // Agregado campo vacío para el UID del guía
     });
 
     const [pagoExitoso, setPagoExitoso] = useState(false);
     const [paypalReady, setPaypalReady] = useState(false);
+    const [precioTotal, setPrecioTotal] = useState(1); // Monto mínimo basado en personas
+    const [montoPersonalizado, setMontoPersonalizado] = useState(1); // Permite pagar más
 
     useEffect(() => {
-        setPaypalReady(true);  // Confirma que PayPal se ha cargado
+        setPaypalReady(true);
     }, []);
+
+    useEffect(() => {
+        const numPersonas = reserva.numeroPersonas ? parseInt(reserva.numeroPersonas, 10) || 1 : 1;
+        const montoMinimo = numPersonas * 1; // $1 por persona
+        setPrecioTotal(montoMinimo);
+        setMontoPersonalizado(montoMinimo); // Establecer mínimo inicial
+    }, [reserva.numeroPersonas]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
 
-        if (name === "numeroPersonas" && (value < 1 || value > 10)) {
-            alert("El número de personas debe ser entre 1 y 10.");
-            return;
-        }
-
-        if (name === "fecha") {
+        if (name === "numeroPersonas") {
+            if (value === "" || (parseInt(value, 10) > 0 && parseInt(value, 10) <= 20)) {
+                setReserva({ ...reserva, numeroPersonas: value });
+            } else {
+                alert("El número de personas debe ser entre 1 y 20.");
+            }
+        } else if (name === "fecha") {
             const today = new Date().toISOString().split("T")[0];
             if (value < today) {
                 alert("No puedes seleccionar una fecha pasada.");
                 return;
             }
+            setReserva({ ...reserva, fecha: value });
+        } else {
+            setReserva({ ...reserva, [name]: value });
         }
+    };
 
-        setReserva({
-            ...reserva,
-            [name]: value,
-        });
+    const handleMontoChange = (e) => {
+        let nuevoMonto = parseFloat(e.target.value);
+        if (nuevoMonto < precioTotal) {
+            alert(`El monto debe ser al menos $${precioTotal.toFixed(2)}`);
+            setMontoPersonalizado(precioTotal);
+        } else {
+            setMontoPersonalizado(nuevoMonto);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -69,6 +88,7 @@ const Reservation = () => {
                 numeroPersonas: "",
                 fecha: "",
                 ruta: "",
+                guiaUid: "", // Mantenerlo vacío hasta que se asigne
             });
 
             setPagoExitoso(false);
@@ -133,9 +153,8 @@ const Reservation = () => {
                                     <input type="number" className="form-control" name="numeroPersonas"
                                         placeholder="Número de Personas"
                                         value={reserva.numeroPersonas}
-                                        onChange={handleChange}
-                                        min="1" max="10" required />
-                                    <label>Número de Personas (Máx 10)</label>
+                                        onChange={handleChange} required />
+                                    <label>Número de Personas (Máx 20)</label>
                                 </div>
                                 <div className="form-floating mb-3">
                                     <input type="date" className="form-control" name="fecha"
@@ -147,38 +166,25 @@ const Reservation = () => {
                                 {/* 🟢 PAYPAL */}
                                 {paypalReady && (
                                     <PayPalScriptProvider options={{ "client-id": "AbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
-                                        <div className="mb-3 d-flex justify-content-center">
-                                            <PayPalButtons
-                                                style={{ layout: "vertical" }}
-                                                createOrder={(data, actions) => {
-                                                    return actions.order.create({
-                                                        purchase_units: [
-                                                            { amount: { value: "10.00" } }
-                                                        ],
-                                                    });
-                                                }}
-                                                onApprove={(data, actions) => {
-                                                    return actions.order.capture().then((details) => {
-                                                        alert("Pago exitoso: " + details.payer.name.given_name);
-                                                        setPagoExitoso(true);
-                                                    });
-                                                }}
-                                                onError={() => {
-                                                    alert("Hubo un error con el pago.");
-                                                    setPagoExitoso(false);
-                                                }}
-                                            />
+                                        <div className="mb-3">
+                                            <label>Monto a pagar (mínimo ${precioTotal.toFixed(2)})</label>
+                                            <input type="number" className="form-control"
+                                                value={montoPersonalizado} onChange={handleMontoChange} min={precioTotal} step="0.01" />
                                         </div>
+                                        <PayPalButtons
+                                            createOrder={(data, actions) => actions.order.create({
+                                                purchase_units: [{ amount: { value: montoPersonalizado.toFixed(2) } }]
+                                            })}
+                                            onApprove={(data, actions) => actions.order.capture().then(() => setPagoExitoso(true))}
+                                            onError={() => setPagoExitoso(false)}
+                                        />
                                     </PayPalScriptProvider>
                                 )}
 
-                                <div className="form-floating d-flex justify-content-center mt-3">
-                                    <button type="submit" className="btn bg-custom-green text-white"
-                                        disabled={!pagoExitoso}>
-                                        Reservar
-                                    </button>
-                                </div>
-
+                                <button type="submit" className="btn bg-custom-green text-white"
+                                    disabled={!pagoExitoso}>
+                                    Reservar
+                                </button>
                             </form>
                         </div>
                     </div>
