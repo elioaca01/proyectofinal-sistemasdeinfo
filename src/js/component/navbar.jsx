@@ -86,8 +86,8 @@ export const Navbar = () => {
 
 					{/* Si el usuario es admin, mostrar "Crear Guía" */}
 					{isAdmin && (
-						<Link to="/create-guide" className="text-custom-green text-decoration-none link-hover" style={{ fontSize: "2rem" }}>
-							Crear Guía
+						<Link to="/management" className="text-custom-green text-decoration-none link-hover" style={{ fontSize: "2rem" }}>
+							Gestionar
 						</Link>
 					)}
 
