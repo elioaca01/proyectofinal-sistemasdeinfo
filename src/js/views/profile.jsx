@@ -1,217 +1,163 @@
-import "../../styles/profile.css";
-import { useEffect, useState } from "react";
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { isAuthenticated, logout } from "../auth";
+import React, { useEffect, useState } from "react";
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
-export const Profile = ({ className, ...props }) => {
-    const navigate = useNavigate();
+const Manage_Excursions = () => {
+    const [excursions, setExcursions] = useState([]);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [editExcursionId, setEditExcursionId] = useState(null);
+    const [guides, setGuides] = useState({});
 
-    // Estados para los datos del perfil
-    const [name, setName] = useState(localStorage.getItem("name") || "");
-    const [lastName, setLastName] = useState(localStorage.getItem("lastName") || "");
-    const [email, setEmail] = useState(localStorage.getItem("email") || "");
-    const [phone, setPhone] = useState(localStorage.getItem("phone") || "");
-    const [occupation, setOccupation] = useState(localStorage.getItem("occupation") || "");
-    const [profileImage, setProfileImage] = useState(localStorage.getItem("profileImage") || "");
+    const [newExcursion, setNewExcursion] = useState({
+        nombre: "",
+        descripcion: "",
+        fecha: "",
+        cupoMaximo: "",
+        dificultad: "",
+        guiaId: "",
+        asistencia: 0,   // Valor predeterminado fijo
+        excursionistas: [] // Lista vacía fija
+    });
 
-    // Redireccionar si no está autenticado
-    useEffect(() => {
-        if (!isAuthenticated()) {
-            navigate("/login");
-        }
-    }, [navigate]);
+    const [editExcursion, setEditExcursion] = useState(null);
 
-    // Validar correo solo con @correo.unimet.edu.ve
-    const isValidEmail = (email) => {
-        const emailRegex = /^[^\s@]+@correo\.unimet\.edu\.ve$/;  // Solo correos @correo.unimet.edu.ve
-        return emailRegex.test(email);
-    };
-
-    // Guardar cambios y validaciones
-    const handleSaveChanges = () => {
-        if (!name || !lastName || !email || !phone || !occupation) {
-            alert("Todos los campos son obligatorios.");
-            return;
-        }
-        if (!isValidEmail(email)) {
-            alert("El correo debe ser válido y terminar en @correo.unimet.edu.ve.");
-            return;
-        }
-        if (!isValidPhone(phone)) {
-            alert("El teléfono solo debe contener números y tener entre 7 y 15 dígitos.");
-            return;
-        }
-
-        // Guardar en localStorage si todo es válido
-        localStorage.setItem("name", name);
-        localStorage.setItem("lastName", lastName);
-        localStorage.setItem("email", email);
-        localStorage.setItem("phone", phone);
-        alert("¡Cambios guardados correctamente!");
-    };
-
-
-    // Cambiar foto de perfil
-    const handleChangePhoto = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfileImage(reader.result);
-                localStorage.setItem("profileImage", reader.result);
+    const fetchExcursions = async () => {
+        const querySnapshot = await getDocs(collection(db, "excursions"));
+        const excursionsList = querySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: parseInt(doc.id),
+                nombre: data.nombre || "",
+                descripcion: data.descripcion || "",
+                fecha: data.fecha || "",
+                cupoMaximo: data.cupoMaximo || 0,
+                dificultad: data.dificultad || "",
+                guiaId: data.guiaId ? parseInt(data.guiaId) : 0,
+                asistencia: data.asistencia ?? 0, // Asegurar que exista asistencia
+                excursionistas: data.excursionistas ?? [] // Asegurar que exista excursionistas
             };
-            reader.readAsDataURL(file);
-        }
+        });
+        setExcursions(excursionsList);
+    };
+
+    useEffect(() => {
+        fetchExcursions();
+    }, []);
+
+    const handleInputChange = (e, setFunction) => {
+        setFunction(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    };
+
+    const handleAddExcursion = async (e) => {
+        e.preventDefault();
+        const newExcursionData = {
+            nombre: newExcursion.nombre,
+            descripcion: newExcursion.descripcion,
+            fecha: newExcursion.fecha,
+            cupoMaximo: Number(newExcursion.cupoMaximo),
+            dificultad: newExcursion.dificultad,
+            guiaId: Number(newExcursion.guiaId),
+            asistencia: 0, // Asegurar que asistencia siempre sea un entero
+            excursionistas: [] // Lista vacía asegurada
+        };
+
+        await addDoc(collection(db, "excursions"), newExcursionData);
+
+        setNewExcursion({
+            nombre: "",
+            descripcion: "",
+            fecha: "",
+            cupoMaximo: "",
+            dificultad: "",
+            guiaId: "",
+            asistencia: 0,
+            excursionistas: []
+        });
+
+        setShowAddForm(false);
+        fetchExcursions();
+    };
+
+    const handleDelete = async (id) => {
+        await deleteDoc(doc(db, "excursions", id.toString()));
+        fetchExcursions();
+    };
+
+    const handleEdit = (excursion) => {
+        setEditExcursion({
+            ...excursion,
+            asistencia: excursion.asistencia ?? 0,
+            excursionistas: excursion.excursionistas ?? []
+        });
+        setEditExcursionId(excursion.id);
+        setShowAddForm(false);
+    };
+
+    const handleUpdateExcursion = async (e) => {
+        e.preventDefault();
+        if (!editExcursionId) return;
+
+        const updatedExcursion = {
+            ...editExcursion,
+            cupoMaximo: Number(editExcursion.cupoMaximo),
+            guiaId: Number(editExcursion.guiaId),
+            asistencia: editExcursion.asistencia ?? 0,
+            excursionistas: editExcursion.excursionistas ?? []
+        };
+
+        const excursionRef = doc(db, "excursions", editExcursionId.toString());
+        await updateDoc(excursionRef, updatedExcursion);
+
+        setEditExcursionId(null);
+        setEditExcursion(null);
+        fetchExcursions();
     };
 
     return (
-        <div className="profile d-flex flex-column align-items-center"
-            style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "70vh" }}>
-            {/* Contenedor de input para config, perfil. */}
-            <div className="d-flex flex-column align-items-center justify-content-center text-custom-green"
-                style={{
-                    maxWidth: "70%",
-                    width: "60%",
-                    backgroundColor: "#f1f6aa",
-                    borderRadius: "15px",
-                    padding: "20px",
-                    border: "3px solid #31470b",
-                    position: "relative"
-                }}>
-
-                {/* Botón de cerrar */}
-                <button
-                    onClick={() => window.location.href = "/"}
-                    style={{
-                        position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        backgroundColor: "transparent",
-                        border: "none",
-                        cursor: "pointer",
-                        fontSize: "20px",
-                        color: "#31470b"
-                    }}>✖</button>
-
-                {/* Título del contenedor */}
-                <h2 style={{
-                    position: "absolute",
-                    top: "20px",
-                    left: "20px",
-                    fontSize: "2rem",
-                    color: "#31470b",
-                }}>CONFIGURACIÓN DE PERFIL</h2>
-
-                {/* Línea decorativa */}
-                <hr style={{ width: "100%", borderTop: "3px solid #31470b", marginTop: "40px", marginBottom: "20px" }} />
-
-                {/* Contenedor de inputs y foto */}
-                <div className="d-flex align-items-center justify-content-center">
-                    <div >
-                        {/* Inputs con estados */}
-                        <input
-                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
-                            style={{ flex: 1, marginRight: "20px" }}
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            placeholder="Nombre"
-                        />
-                        <input
-                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
-                            style={{ flex: 1, marginRight: "20px" }}
-                            value={lastName}
-                            onChange={(e) => setLastName(e.target.value)}
-                            placeholder="Apellido" />
-                        <input
-                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
-                            style={{ flex: 1, marginRight: "20px" }}
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="Correo" />
-                        <input
-                            className="d-flex flex-column inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
-                            style={{ flex: 1, marginRight: "20px" }}
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            placeholder="Teléfono" />
-
-                        {/* Botón para guardar cambios */}
-                        <button
-                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
-                            onClick={handleSaveChanges}
-                            style={buttonStyle}>
-                            Guardar Cambios
-                        </button>
-                    </div>
-
-                    <div className="d-flex flex-column align-items-center"
-                        style={{ marginLeft: "20px" }}>
-                        <div
-                            className="ellipse-6"
-                            style={{
-                                width: "100%",
-                                maxWidth: "150px",
-                                aspectRatio: "1",
-                                borderRadius: "80%",
-                                overflow: "hidden",
-                                backgroundColor: "#31470b",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center"
-                            }}
-                        >
-                            {profileImage ? (
-                                <img
-                                    src={profileImage}
-                                    alt="Perfil"
-                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                />
+        <div style={{ width: "100%", backgroundColor: "#f4f4f4", padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
+            <h2>Gestión de Excursiones</h2>
+            <button onClick={() => { setShowAddForm(!showAddForm); setEditExcursionId(null); }} style={{ marginBottom: "20px" }}>
+                {showAddForm ? "Cancelar" : "Agregar Excursión"}
+            </button>
+            {showAddForm && (
+                <form onSubmit={handleAddExcursion} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+                    {Object.keys(newExcursion).map((key) => (
+                        <input key={key} type="text" name={key} placeholder={key.charAt(0).toUpperCase() + key.slice(1)} value={newExcursion[key]} onChange={(e) => handleInputChange(e, setNewExcursion)} required style={{ marginBottom: "10px", width: "90%" }} />
+                    ))}
+                    <button type="submit">Guardar Excursión</button>
+                </form>
+            )}
+            <div>
+                {excursions.map(excursion => (
+                    <div key={excursion.id} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px", backgroundColor: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center", width: "400px" }}>
+                        <div>
+                            {editExcursionId === excursion.id ? (
+                                <form onSubmit={handleUpdateExcursion} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
+                                    {Object.keys(editExcursion).map((key) => (
+                                        <input key={key} type="text" name={key} placeholder={key.charAt(0).toUpperCase() + key.slice(1)} value={editExcursion[key]} onChange={(e) => handleInputChange(e, setEditExcursion)} required style={{ width: "90%", marginBottom: "10px" }} />
+                                    ))}
+                                    <button type="submit">Actualizar</button>
+                                    <button type="button" onClick={() => setEditExcursionId(null)}>Cancelar</button>
+                                </form>
                             ) : (
-                                <i
-                                    className="fas fa-user"
-                                    style={{ fontSize: "min(80px, 10vw)", color: "#fef9c3" }}
-                                    aria-hidden="true"
-                                ></i>
+                                <>
+                                    <h3>{excursion.nombre}</h3>
+                                    <p><strong>Descripción:</strong> {excursion.descripcion}</p>
+                                    <p><strong>Fecha:</strong> {excursion.fecha}</p>
+                                    <p><strong>Cupo Máximo:</strong> {excursion.cupoMaximo}</p>
+                                    <p><strong>Dificultad:</strong> {excursion.dificultad}</p>
+                                    <p><strong>Asistencia:</strong> {excursion.asistencia}</p>
+                                    <p><strong>Excursionistas:</strong> {excursion.excursionistas.length}</p>
+                                    <button onClick={() => handleEdit(excursion)}>Editar</button>
+                                    <button onClick={() => handleDelete(excursion.id)} style={{ color: "red", marginLeft: "10px" }}>Eliminar</button>
+                                </>
                             )}
                         </div>
-
-                        {/* Input para subir foto */}
-                        <input type="file" accept="image/*" onChange={handleChangePhoto} style={{ display: "none" }} id="fileInput" />
-                        <button
-                            className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
-                            onClick={() => document.getElementById("fileInput").click()}
-                            style={buttonStyle}>
-                            Cambiar Foto
-                        </button>
                     </div>
-                </div>
+                ))}
             </div>
         </div>
     );
 };
 
-// Estilos reutilizables
-const inputStyle = {
-    backgroundColor: "#a2a87b",
-    border: "none",
-    height: "40px",
-    width: "350px",
-    marginBottom: "10px",
-    color: "#31470b",
-    borderRadius: "5px",
-    paddingLeft: "10px"
-};
-
-const buttonStyle = {
-    width: "200px",
-    height: "40px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginTop: "10px",
-    backgroundColor: "#31470b",
-    color: "#fef9c3"
-};
-
-export default Profile;
+export default Manage_Excursions;

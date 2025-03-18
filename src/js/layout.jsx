@@ -45,6 +45,7 @@ const Layout = () => {
 						<Route path="/gallery" element={<Gallery />} />
 						<Route path="/management" element={<Management />} />
 						<Route path="/manage_guides" element={<Manage_Guides />} />
+						<Route path="/manage_excursions" element={<Manage_Excursions />} />
 						<Route path="/manage_routes" element={<Manage_Routes />} />
 						<Route path="/adddestination" element={<AddDestination />} />
 						<Route path="*" element={<h1>Not found!</h1>} />

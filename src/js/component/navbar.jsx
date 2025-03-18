@@ -89,7 +89,7 @@ export const Navbar = () => {
 
 					{/* Si el usuario es admin, mostrar "Crear Guía" */}
 					{isAdmin && (
-						<Link to="/management" className="text-custom-green text-decoration-none link-hover" style={{ fontSize: "2rem" }}>
+						<Link to="/management" className="text-custom-paragraph text-decoration-none link-hover">
 							Gestionar
 						</Link>
 					)}
@@ -123,9 +123,10 @@ export const Navbar = () => {
 											Perfil</button>
 									</Link>
 								)}
-								<button onClick={handleLogout} className="btn btn-danger text-white text-custom-paragraph2"
-									style={{ fontSize: "1rem" }}>
-									Cerrar sesión
+								<button onClick={handleLogout} className="btn-logout" style={{ background: "none", border: "none", padding: 0 }}>
+									<img src="https://res.cloudinary.com/do9dtxrvh/image/upload/v1742317260/Untitled_design_1_rhkoqu.png"
+										alt="Cerrar sesión" className="logout-icon"
+										style={{ background: "none", border: "none", padding: 0, width: "80px", height: "80px" }} />
 								</button>
 							</>
 						) : (
