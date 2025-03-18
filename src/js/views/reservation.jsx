@@ -146,7 +146,7 @@ const Reservation = () => {
 
                                 {/* 🟢 PAYPAL */}
                                 {paypalReady && (
-                                    <PayPalScriptProvider options={{ "client-id": "TAbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
+                                    <PayPalScriptProvider options={{ "client-id": "AbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
                                         <div className="mb-3 d-flex justify-content-center">
                                             <PayPalButtons
                                                 style={{ layout: "vertical" }}
