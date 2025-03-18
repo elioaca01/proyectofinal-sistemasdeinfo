@@ -13,6 +13,7 @@ import Gallery from "./views/gallery.jsx";
 import Management from "./views/management.jsx";
 import Manage_Guides from "./views/manage_guides.jsx";
 import Manage_Excursions from "./views/manage_excursions.jsx";
+import AddDestination from "./views/adddestination.jsx";
 import Manage_Routes from "./views/manage_routes.jsx";
 import injectContext from "./store/appContext.jsx";
 
@@ -45,6 +46,7 @@ const Layout = () => {
 						<Route path="/management" element={<Management />} />
 						<Route path="/manage_guides" element={<Manage_Guides />} />
 						<Route path="/manage_routes" element={<Manage_Routes />} />
+						<Route path="/adddestination" element={<AddDestination />} />
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />
