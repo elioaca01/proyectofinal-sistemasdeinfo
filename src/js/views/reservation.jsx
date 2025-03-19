@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { db } from "../../js/firebase.js";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import { db, auth } from "../../js/firebase.js";
+import { collection, addDoc, query, where, getDocs, doc, setDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 const Reservation = () => {
     const [reserva, setReserva] = useState({
@@ -9,7 +10,7 @@ const Reservation = () => {
         apellido: "",
         email: "",
         telefono: "",
-        numeroPersonas: "",
+        numeroPersonas: 1, // Valor inicial de 1 persona
         fecha: "",
         ruta: "",
         guiaUid: "",
@@ -21,14 +22,23 @@ const Reservation = () => {
     const [montoPersonalizado, setMontoPersonalizado] = useState(1);
     const [excursiones, setExcursiones] = useState([]);
     const [excursionSeleccionada, setExcursionSeleccionada] = useState(null);
+    const [usuario, setUsuario] = useState(null);
 
     useEffect(() => {
         setPaypalReady(true);
-    }, []);
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUsuario(user); // Usuario autenticado
+                setReserva({ ...reserva, email: user.email, telefono: user.phoneNumber });
+            }
+        });
+
+        return () => unsubscribe(); // Limpiar el listener
+    }, [reserva.email]);
 
     useEffect(() => {
         const numPersonas = reserva.numeroPersonas ? parseInt(reserva.numeroPersonas, 10) || 1 : 1;
-        const montoMinimo = numPersonas * 1;
+        const montoMinimo = numPersonas * 1; // El monto mínimo es $1 por persona
         setPrecioTotal(montoMinimo);
         setMontoPersonalizado(montoMinimo);
     }, [reserva.numeroPersonas]);
@@ -56,12 +66,49 @@ const Reservation = () => {
 
     const handleSeleccionarExcursion = (excursion) => {
         setExcursionSeleccionada(excursion);
-        setReserva({ ...reserva, ruta: excursion.nombre });
+        setReserva({ ...reserva, ruta: excursion.nombre, guiaUid: excursion.guiaUid, fecha: excursion.fecha });
     };
 
     const handleCancelarSeleccion = () => {
         setExcursionSeleccionada(null);
-        setReserva({ ...reserva, ruta: "" });
+        setReserva({ ...reserva, ruta: "", guiaUid: "", fecha: "" });
+    };
+
+    const handleReserva = async () => {
+        try {
+            if (parseInt(reserva.numeroPersonas) > 20) {
+                alert("El máximo de personas por reserva es 20.");
+                return;
+            }
+
+            const reservaData = {
+                nombre: usuario.displayName, // Nombre del usuario autenticado
+                email: usuario.email,        // Correo del usuario
+                telefono: usuario.phoneNumber, // Teléfono del usuario
+                numeroPersonas: reserva.numeroPersonas,
+                ruta: reserva.ruta,
+                fecha: reserva.fecha,
+                guiaUid: reserva.guiaUid,
+                pagoExitoso: pagoExitoso,
+            };
+
+            await addDoc(collection(db, "reservas"), reservaData);
+            alert("Reserva realizada con éxito.");
+
+            setReserva({
+                nombre: "",
+                apellido: "",
+                email: "",
+                telefono: "",
+                numeroPersonas: 1, // Reiniciar a 1 persona
+                fecha: "",
+                ruta: "",
+                guiaUid: "",
+            });
+
+        } catch (error) {
+            console.error("Error al realizar la reserva:", error);
+        }
     };
 
     return (
@@ -110,7 +157,8 @@ const Reservation = () => {
                         <div className="col-md-6 text-center">
                             <div className="card p-3 shadow-lg" style={{ borderRadius: "15px" }}>
                                 <h4 className="fw-bold text-success">{excursionSeleccionada.nombre}</h4>
-                                <p className="text-muted">{excursionSeleccionada.descripcion}</p>
+                                <p className="text-muted">Fecha: {excursionSeleccionada.fecha}</p>
+                                <p className="text-muted">Guía: {excursionSeleccionada.guia}</p>
                                 <button className="btn btn-danger mt-2" onClick={handleCancelarSeleccion}>
                                     Cancelar selección
                                 </button>
@@ -123,6 +171,20 @@ const Reservation = () => {
                     <div className="col-12 col-md-4 mb-5 p-4 border rounded shadow bg-light">
                         <form>
                             <div className="mb-3">
+                                <label className="fw-bold">Cantidad de personas (máximo 20)</label>
+                                <input
+                                    type="number"
+                                    className="form-control"
+                                    name="numeroPersonas"
+                                    value={reserva.numeroPersonas}
+                                    onChange={handleChange}
+                                    min="1"
+                                    max="20"
+                                    required
+                                />
+                            </div>
+
+                            <div className="mb-3">
                                 <label className="fw-bold">Monto a pagar (mínimo ${precioTotal.toFixed(2)})</label>
                                 <input type="number" className="form-control"
                                     value={montoPersonalizado} onChange={(e) => setMontoPersonalizado(parseFloat(e.target.value))}
@@ -130,7 +192,7 @@ const Reservation = () => {
                             </div>
 
                             {paypalReady && (
-                                <PayPalScriptProvider options={{ "client-id": "TU_CLIENT_ID" }}>
+                                <PayPalScriptProvider options={{ "client-id": "AbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
                                     <PayPalButtons
                                         createOrder={(data, actions) => actions.order.create({
                                             purchase_units: [{ amount: { value: montoPersonalizado.toFixed(2) } }]
@@ -141,9 +203,9 @@ const Reservation = () => {
                             )}
 
                             {excursionSeleccionada && (
-                                <button type="submit" className="btn text-white w-100 mt-3"
+                                <button type="button" className="btn text-white w-100 mt-3"
                                     style={{ backgroundColor: "#045c2c", borderRadius: "10px", fontSize: "18px" }}
-                                    disabled={!pagoExitoso}>
+                                    disabled={!pagoExitoso} onClick={handleReserva}>
                                     Reservar
                                 </button>
                             )}
@@ -153,6 +215,6 @@ const Reservation = () => {
             </div>
         </>
     );
-}
+};
 
 export default Reservation;

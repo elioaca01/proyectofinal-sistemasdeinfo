@@ -85,7 +85,7 @@ const Profile = () => {
 
         try {
             const response = await axios.post(
-                "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload", // Reemplaza TU_CLOUD_NAME con tu Cloudinary Name
+                "https://api.cloudinary.com/v1_1/dhlyuaknz/image/upload", // Reemplaza TU_CLOUD_NAME con tu Cloudinary Name
                 formData
             );
 

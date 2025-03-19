@@ -1,128 +1,161 @@
-import React, { useState, useEffect } from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { db } from "../../js/firebase.js";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
-const Reservation = () => {
-    const [reserva, setReserva] = useState({
+const ManageExcursions = () => {
+    const [excursions, setExcursions] = useState([]);
+    const [destinations, setDestinations] = useState([]);
+    const [guides, setGuides] = useState([]);
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [editExcursionId, setEditExcursionId] = useState(null);
+
+    const [newExcursion, setNewExcursion] = useState({
         nombre: "",
-        apellido: "",
-        email: "",
-        telefono: "",
-        numeroPersonas: "",
+        descripcion: "",
         fecha: "",
-        ruta: "",
-        guiaUid: "",
+        dificultad: "",
+        destinoId: "",
+        guiaId: ""
     });
 
-    const [pagoExitoso, setPagoExitoso] = useState(false);
-    const [paypalReady, setPaypalReady] = useState(false);
-    const [precioTotal, setPrecioTotal] = useState(1);
-    const [montoPersonalizado, setMontoPersonalizado] = useState(1);
-    const [excursiones, setExcursiones] = useState([]);
-    const [excursionSeleccionada, setExcursionSeleccionada] = useState(null);
+    const [editExcursion, setEditExcursion] = useState(null);
 
     useEffect(() => {
-        setPaypalReady(true);
+        fetchExcursions();
+        fetchDestinations();
+        fetchGuides();
     }, []);
 
-    useEffect(() => {
-        const numPersonas = reserva.numeroPersonas ? parseInt(reserva.numeroPersonas, 10) || 1 : 1;
-        const montoMinimo = numPersonas * 1;
-        setPrecioTotal(montoMinimo);
-        setMontoPersonalizado(montoMinimo);
-    }, [reserva.numeroPersonas]);
-
-    const handleChange = async (e) => {
-        const { name, value } = e.target;
-        setReserva({ ...reserva, [name]: value });
-
-        if (name === "ruta" && value) {
-            buscarExcursiones(value);
-            setExcursionSeleccionada(null);
-        }
+    // Cargar excursiones desde Firebase
+    const fetchExcursions = async () => {
+        const querySnapshot = await getDocs(collection(db, "excursions"));
+        const excursionsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setExcursions(excursionsList);
     };
 
-    const buscarExcursiones = async (rutaSeleccionada) => {
+    // Cargar destinos desde Firebase
+    const fetchDestinations = async () => {
+        const querySnapshot = await getDocs(collection(db, "destinations"));
+        const destinationsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setDestinations(destinationsList);
+    };
+
+    // Cargar guías desde Firebase
+    const fetchGuides = async () => {
         try {
-            const q = query(collection(db, "excursions"), where("nombre", "==", rutaSeleccionada));
-            const querySnapshot = await getDocs(q);
-            const resultados = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setExcursiones(resultados);
+            const querySnapshot = await getDocs(collection(db, "users"));
+            const guidesList = querySnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(user => user.rol && user.rol.toLowerCase() === "guía");
+
+            setGuides(guidesList);
         } catch (error) {
-            console.error("Error al buscar excursiones:", error);
+            console.error("Error al obtener los guías:", error);
         }
     };
 
-    const handleSeleccionarExcursion = (excursion) => {
-        setExcursionSeleccionada(excursion);
-        setReserva({ ...reserva, ruta: excursion.nombre });
+    const handleInputChange = (e, setFunction) => {
+        setFunction(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
-    const handleCancelarSeleccion = () => {
-        setExcursionSeleccionada(null);
-        setReserva({ ...reserva, ruta: "" });
+    const handleAddExcursion = async (e) => {
+        e.preventDefault();
+        if (!newExcursion.destinoId || !newExcursion.guiaId) {
+            alert("Debe seleccionar un destino y un guía.");
+            return;
+        }
+
+        await addDoc(collection(db, "excursions"), newExcursion);
+        setNewExcursion({ nombre: "", descripcion: "", fecha: "", dificultad: "", destinoId: "", guiaId: "" });
+
+        setShowAddForm(false);
+        fetchExcursions();
+    };
+
+    const handleDelete = async (id) => {
+        if (!id) return;
+
+        try {
+            await deleteDoc(doc(db, "excursions", id));
+            setExcursions(prev => prev.filter(excursion => excursion.id !== id));
+            alert("Excursión eliminada con éxito.");
+        } catch (error) {
+            console.error("Error al eliminar la excursión:", error);
+        }
+    };
+
+    const handleEdit = (excursion) => {
+        setEditExcursion({ ...excursion });
+        setEditExcursionId(excursion.id);
+        setShowAddForm(false);
+    };
+
+    const handleUpdateExcursion = async (e) => {
+        e.preventDefault();
+        if (!editExcursionId) return;
+
+        try {
+            const excursionRef = doc(db, "excursions", editExcursionId);
+            await updateDoc(excursionRef, editExcursion);
+            setEditExcursionId(null);
+            setEditExcursion(null);
+            fetchExcursions();
+            alert("Excursión actualizada correctamente.");
+        } catch (error) {
+            console.error("Error al actualizar la excursión:", error);
+        }
     };
 
     return (
-        <>
-            <div className="container-fluid p-4 text-center" style={{ backgroundColor: "#fbfada" }}>
-                <h1 className="fw-bold" style={{ color: "#045c2c" }}>RESERVAS</h1>
-            </div>
+        <div style={{ width: "100%", backgroundColor: "#f4f4f4", padding: "30px", textAlign: "center" }}>
+            <h2 style={{ color: "#333", marginBottom: "20px" }}>Gestión de Excursiones</h2>
+            <button onClick={() => { setShowAddForm(!showAddForm); setEditExcursionId(null); }}
+                style={{ padding: "10px 20px", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>
+                {showAddForm ? "Cancelar" : "Agregar Excursión"}
+            </button>
 
-            <div className="container my-5">
-                <div className="row justify-content-center">
-                    <div className="col-12 col-md-5">
-                        <select className="form-select borde mt-3 p-2"
-                            name="ruta"
-                            value={reserva.ruta}
-                            onChange={handleChange}
-                            required>
-                            <option value="">Seleccione una ruta</option>
-                            <option value="Sabas Nieve">Sabas Nieve</option>
-                            <option value="Lagunazo">Lagunazo</option>
-                            <option value="El Banquito, Lagunazo y Pico">El Banquito, Lagunazo y Pico</option>
-                            <option value="Pico Naiguiata">Pico Naiguiata</option>
-                            <option value="Cruz de los palmeros y Pico Oriental">Cruz de los palmeros y Pico Oriental</option>
-                            <option value="Piedra del indio Via Quebrada Quintero">Piedra del indio Via Quebrada Quintero</option>
-                        </select>
+            {showAddForm && (
+                <form onSubmit={handleAddExcursion}
+                    style={{ marginTop: "20px", backgroundColor: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0px 4px 8px rgba(0,0,0,0.1)", maxWidth: "400px", margin: "auto" }}>
+                    <input type="text" name="nombre" placeholder="Nombre" value={newExcursion.nombre} onChange={(e) => handleInputChange(e, setNewExcursion)} required />
+                    <textarea name="descripcion" placeholder="Descripción" value={newExcursion.descripcion} onChange={(e) => handleInputChange(e, setNewExcursion)} />
+                    <input type="date" name="fecha" value={newExcursion.fecha} onChange={(e) => handleInputChange(e, setNewExcursion)} required />
+                    <input type="text" name="dificultad" placeholder="Dificultad" value={newExcursion.dificultad} onChange={(e) => handleInputChange(e, setNewExcursion)} />
+
+                    <select name="destinoId" value={newExcursion.destinoId} onChange={(e) => handleInputChange(e, setNewExcursion)} required>
+                        <option value="">Seleccione un destino</option>
+                        {destinations.map(destino => (
+                            <option key={destino.id} value={destino.id}>{destino.nombre}</option>
+                        ))}
+                    </select>
+
+                    <select name="guiaId" value={newExcursion.guiaId} onChange={(e) => handleInputChange(e, setNewExcursion)} required>
+                        <option value="">Seleccione un guía</option>
+                        {guides.map(guia => (
+                            <option key={guia.id} value={guia.id}>{guia.nombre} - {guia.años_experiencia} años</option>
+                        ))}
+                    </select>
+
+                    <button type="submit" style={{ marginTop: "10px", padding: "10px", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" }}>
+                        Guardar Excursión
+                    </button>
+                </form>
+            )}
+
+            <div style={{ marginTop: "20px", display: "flex", flexWrap: "wrap", justifyContent: "center" }}>
+                {excursions.map(excursion => (
+                    <div key={excursion.id} style={{ border: "1px solid #ddd", padding: "15px", margin: "10px", backgroundColor: "#fff", borderRadius: "8px", width: "300px" }}>
+                        <h3>{excursion.nombre}</h3>
+                        <p><strong>Descripción:</strong> {excursion.descripcion}</p>
+                        <p><strong>Fecha:</strong> {excursion.fecha}</p>
+                        <p><strong>Guía:</strong> {guides.find(g => g.id === excursion.guiaId)?.nombre || "No asignado"}</p>
+                        <button onClick={() => handleEdit(excursion)}>Editar</button>
+                        <button onClick={() => handleDelete(excursion.id)} style={{ color: "red" }}>Eliminar</button>
                     </div>
-                </div>
-
-                <div className="row mt-5 justify-content-center">
-                    <div className="col-12 col-md-4 mb-5 p-4 border rounded shadow" style={{ backgroundColor: "#fbfada" }}>
-                        <form>
-                            <div className="mb-3">
-                                <label className="fw-bold" style={{ color: "#045c2c" }}>Monto a pagar (mínimo ${precioTotal.toFixed(2)})</label>
-                                <input type="number" className="form-control"
-                                    value={montoPersonalizado} onChange={(e) => setMontoPersonalizado(parseFloat(e.target.value))}
-                                    min={precioTotal} step="0.01" />
-                            </div>
-
-                            {paypalReady && (
-                                <PayPalScriptProvider options={{ "client-id": "TU_CLIENT_ID" }}>
-                                    <PayPalButtons
-                                        createOrder={(data, actions) => actions.order.create({
-                                            purchase_units: [{ amount: { value: montoPersonalizado.toFixed(2) } }]
-                                        })}
-                                        onApprove={(data, actions) => actions.order.capture().then(() => setPagoExitoso(true))}
-                                    />
-                                </PayPalScriptProvider>
-                            )}
-
-                            {excursionSeleccionada && (
-                                <button type="submit" className="btn text-white w-100 mt-3"
-                                    style={{ backgroundColor: "#045c2c", borderRadius: "10px", fontSize: "18px" }}
-                                    disabled={!pagoExitoso}>
-                                    Reservar
-                                </button>
-                            )}
-                        </form>
-                    </div>
-                </div>
+                ))}
             </div>
-        </>
+        </div>
     );
-}
+};
 
-export default Reservation;
+export default ManageExcursions;

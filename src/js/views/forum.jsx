@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-//import { auth } from '../firebase'; // Asegúrate de importar auth desde tu archivo de configuración de Firebase
-// import { onAuthStateChanged } from 'firebase/auth';
 import { Context } from '../store/appContext'; // Importa el contexto
+import { db, auth } from '../firebase'; // Asegúrate de que Firebase esté bien configurado
+import { addDoc, collection, getDocs } from "firebase/firestore";
+import axios from "axios"; // Necesitamos Axios para hacer la petición a Cloudinary
+import { getAuth, onAuthStateChanged } from "firebase/auth"; // Importa correctamente `onAuthStateChanged` de Firebase
 
 const Forum = () => {
     const { store } = useContext(Context); // Obtén el estado del contexto
@@ -10,49 +12,88 @@ const Forum = () => {
     const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
 
     // Verificar el estado de autenticación del usuario
-    // useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    //         setUser(currentUser); // Actualiza el estado del usuario
-    //     });
+    useEffect(() => {
+        const auth = getAuth(); // Obtener la instancia de Firebase Auth
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser); // Actualiza el estado del usuario
+        });
 
-    //     return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
-    // }, []);
+        return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
+    }, []);
 
-    const handlePostSubmit = () => {
+    // Cargar las publicaciones desde Firestore cuando se monta el componente
+    useEffect(() => {
+        const loadPosts = async () => {
+            const querySnapshot = await getDocs(collection(db, "posts"));
+            const postsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setPosts(postsData);
+        };
+        loadPosts();
+    }, []);
+
+    const handlePostSubmit = async () => {
         if (!user) {
-            alert("Debes iniciar sesión para publicar."); // Mensaje de alerta si no hay sesión
+            alert("Debes iniciar sesión para publicar.");
             return;
         }
 
         if (newPost.text || newPost.image) {
             const currentDate = new Date().toLocaleString();
+            let imageUrl = "";
+
+            // Si hay una imagen, subirla a Cloudinary
+            if (newPost.image) {
+                const formData = new FormData();
+                formData.append("file", newPost.image);
+                formData.append("upload_preset", "mi_preset"); // Reemplaza con tu preset de Cloudinary
+
+                // Subir la imagen a Cloudinary
+                await axios.post("https://api.cloudinary.com/v1_1/dhlyuaknz/image/upload", formData)
+                    .then(response => {
+                        imageUrl = response.data.secure_url; // Obtener la URL de la imagen subida
+                    }).catch(error => {
+                        console.error("Error al subir la imagen a Cloudinary:", error);
+                    });
+            }
+
             const newPostData = {
-                ...newPost,
+                text: newPost.text,
+                image: imageUrl, // Guardamos la URL de la imagen de Cloudinary
                 date: currentDate,
                 user: user.displayName || user.email, // Mostrar el nombre o email del usuario
                 comments: [],
                 likes: 0,
                 likedBy: [] // Array para almacenar los IDs de los usuarios que han dado like
             };
-            setPosts([newPostData, ...posts]); // Agregar nuevo post al inicio
-            setNewPost({ text: '', image: null });
+
+            // Guardar el post en Firestore
+            await addDoc(collection(db, "posts"), newPostData);
+
+            // Luego de agregar el nuevo post, recargar los posts para que se muestren
+            const querySnapshot = await getDocs(collection(db, "posts"));
+            const postsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setPosts(postsData);
+
+            setNewPost({ text: '', image: null }); // Resetear el post
         }
     };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setNewPost({ ...newPost, image: event.target.result });
-            };
-            reader.readAsDataURL(file);
+            setNewPost({ ...newPost, image: file }); // Guardar el archivo en el estado
         }
     };
 
     const handleAddComment = (index, comment) => {
         if (!user) {
-            alert("Debes iniciar sesión para comentar."); // Mensaje de alerta si no hay sesión
+            alert("Debes iniciar sesión para comentar.");
             return;
         }
         if (comment.trim() === '') return;
@@ -63,7 +104,7 @@ const Forum = () => {
 
     const handleLike = (index) => {
         if (!user) {
-            alert("Debes iniciar sesión para dar like."); // Mensaje de alerta si no hay sesión
+            alert("Debes iniciar sesión para dar like.");
             return;
         }
         const updatedPosts = [...posts];
@@ -71,12 +112,12 @@ const Forum = () => {
 
         // Verificar si el usuario ya ha dado like
         if (post.likedBy.includes(user.uid)) {
-            alert("Ya has dado like a esta publicación."); // Mensaje si ya ha dado like
+            alert("Ya has dado like a esta publicación.");
             return;
         }
 
-        post.likes += 1; // Incrementar el contador de likes
-        post.likedBy.push(user.uid); // Agregar el ID del usuario al array de usuarios que han dado like
+        post.likes += 1;
+        post.likedBy.push(user.uid);
         setPosts(updatedPosts);
     };
 
@@ -112,7 +153,7 @@ const Forum = () => {
                             onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
                             style={{ width: '100%', padding: '8px', marginBottom: '8px' }}
                         />
-                        {newPost.image && <img src={newPost.image} alt="Vista previa" style={{ borderRadius: '8px', width: '100%' }} />}
+                        {newPost.image && <img src={URL.createObjectURL(newPost.image)} alt="Vista previa" style={{ borderRadius: '8px', width: '100%' }} />}
                         <button onClick={handlePostSubmit} style={{ padding: '8px 16px', backgroundColor: '#2e4e1e', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Publicar</button>
                     </div>
 
