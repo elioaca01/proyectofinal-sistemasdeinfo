@@ -76,7 +76,7 @@ const Reservation = () => {
         }
 
         try {
-            const docRef = await addDoc(collection(db, "reservas"), reserva);
+            const docRef = await addDoc(collection(db, "reservations"), reserva);
             console.log("✅ Reserva guardada con ID:", docRef.id);
             alert("Reserva realizada con éxito!");
 

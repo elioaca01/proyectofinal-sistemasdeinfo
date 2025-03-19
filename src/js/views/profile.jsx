@@ -1,163 +1,198 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { db, auth } from "../firebase"; // Importar Firebase
+import axios from "axios"; // Importar Axios para la subida de imágenes
+import { onAuthStateChanged } from "firebase/auth";
 
-const Manage_Excursions = () => {
-    const [excursions, setExcursions] = useState([]);
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [editExcursionId, setEditExcursionId] = useState(null);
-    const [guides, setGuides] = useState({});
-
-    const [newExcursion, setNewExcursion] = useState({
+const Profile = () => {
+    const [userData, setUserData] = useState(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [editedData, setEditedData] = useState({
         nombre: "",
-        descripcion: "",
-        fecha: "",
-        cupoMaximo: "",
-        dificultad: "",
-        guiaId: "",
-        asistencia: 0,   // Valor predeterminado fijo
-        excursionistas: [] // Lista vacía fija
+        apellido: "",
+        email: "",
+        telefono: "",
+        fotoPerfil: ""
     });
 
-    const [editExcursion, setEditExcursion] = useState(null);
-
-    const fetchExcursions = async () => {
-        const querySnapshot = await getDocs(collection(db, "excursions"));
-        const excursionsList = querySnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-                id: parseInt(doc.id),
-                nombre: data.nombre || "",
-                descripcion: data.descripcion || "",
-                fecha: data.fecha || "",
-                cupoMaximo: data.cupoMaximo || 0,
-                dificultad: data.dificultad || "",
-                guiaId: data.guiaId ? parseInt(data.guiaId) : 0,
-                asistencia: data.asistencia ?? 0, // Asegurar que exista asistencia
-                excursionistas: data.excursionistas ?? [] // Asegurar que exista excursionistas
-            };
-        });
-        setExcursions(excursionsList);
-    };
-
     useEffect(() => {
-        fetchExcursions();
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                console.error("No hay usuario autenticado.");
+                return;
+            }
+
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    setUserData(userData);
+                    setEditedData({
+                        nombre: userData.nombre || "",
+                        apellido: userData.apellido || "",
+                        email: userData.email || "",
+                        telefono: userData.telefono || "",
+                        fotoPerfil: userData.fotoPerfil || ""
+                    });
+                } else {
+                    console.warn("No se encontraron datos del usuario.");
+                }
+            } catch (error) {
+                console.error("Error al obtener datos del usuario:", error);
+            }
+        });
+
+        return () => unsubscribe(); // Limpiar listener
     }, []);
 
-    const handleInputChange = (e, setFunction) => {
-        setFunction(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const handleEditToggle = () => {
+        setIsEditing(!isEditing);
     };
 
-    const handleAddExcursion = async (e) => {
-        e.preventDefault();
-        const newExcursionData = {
-            nombre: newExcursion.nombre,
-            descripcion: newExcursion.descripcion,
-            fecha: newExcursion.fecha,
-            cupoMaximo: Number(newExcursion.cupoMaximo),
-            dificultad: newExcursion.dificultad,
-            guiaId: Number(newExcursion.guiaId),
-            asistencia: 0, // Asegurar que asistencia siempre sea un entero
-            excursionistas: [] // Lista vacía asegurada
-        };
-
-        await addDoc(collection(db, "excursions"), newExcursionData);
-
-        setNewExcursion({
-            nombre: "",
-            descripcion: "",
-            fecha: "",
-            cupoMaximo: "",
-            dificultad: "",
-            guiaId: "",
-            asistencia: 0,
-            excursionistas: []
-        });
-
-        setShowAddForm(false);
-        fetchExcursions();
+    const handleChange = (e) => {
+        setEditedData({ ...editedData, [e.target.name]: e.target.value });
     };
 
-    const handleDelete = async (id) => {
-        await deleteDoc(doc(db, "excursions", id.toString()));
-        fetchExcursions();
+    const handleSaveChanges = async () => {
+        const user = auth.currentUser;
+        if (!user) {
+            console.error("No hay usuario autenticado.");
+            return;
+        }
+
+        try {
+            const userRef = doc(db, "users", user.uid);
+            await updateDoc(userRef, editedData);
+
+            setUserData((prev) => ({ ...prev, ...editedData }));
+            setIsEditing(false);
+        } catch (error) {
+            console.error("Error al actualizar datos:", error);
+        }
     };
 
-    const handleEdit = (excursion) => {
-        setEditExcursion({
-            ...excursion,
-            asistencia: excursion.asistencia ?? 0,
-            excursionistas: excursion.excursionistas ?? []
-        });
-        setEditExcursionId(excursion.id);
-        setShowAddForm(false);
-    };
+    const handleChangePhoto = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
 
-    const handleUpdateExcursion = async (e) => {
-        e.preventDefault();
-        if (!editExcursionId) return;
+        setUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "mi_preset"); // Reemplaza con tu preset en Cloudinary
 
-        const updatedExcursion = {
-            ...editExcursion,
-            cupoMaximo: Number(editExcursion.cupoMaximo),
-            guiaId: Number(editExcursion.guiaId),
-            asistencia: editExcursion.asistencia ?? 0,
-            excursionistas: editExcursion.excursionistas ?? []
-        };
+        try {
+            const response = await axios.post(
+                "https://api.cloudinary.com/v1_1/TU_CLOUD_NAME/image/upload", // Reemplaza TU_CLOUD_NAME con tu Cloudinary Name
+                formData
+            );
 
-        const excursionRef = doc(db, "excursions", editExcursionId.toString());
-        await updateDoc(excursionRef, updatedExcursion);
+            const imageUrl = response.data.secure_url;
 
-        setEditExcursionId(null);
-        setEditExcursion(null);
-        fetchExcursions();
+            const user = auth.currentUser;
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, { fotoPerfil: imageUrl });
+
+                setUserData((prev) => ({ ...prev, fotoPerfil: imageUrl }));
+                setEditedData((prev) => ({ ...prev, fotoPerfil: imageUrl }));
+            }
+        } catch (error) {
+            console.error("Error al subir la imagen:", error);
+        }
+
+        setUploading(false);
     };
 
     return (
-        <div style={{ width: "100%", backgroundColor: "#f4f4f4", padding: "20px", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <h2>Gestión de Excursiones</h2>
-            <button onClick={() => { setShowAddForm(!showAddForm); setEditExcursionId(null); }} style={{ marginBottom: "20px" }}>
-                {showAddForm ? "Cancelar" : "Agregar Excursión"}
-            </button>
-            {showAddForm && (
-                <form onSubmit={handleAddExcursion} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-                    {Object.keys(newExcursion).map((key) => (
-                        <input key={key} type="text" name={key} placeholder={key.charAt(0).toUpperCase() + key.slice(1)} value={newExcursion[key]} onChange={(e) => handleInputChange(e, setNewExcursion)} required style={{ marginBottom: "10px", width: "90%" }} />
-                    ))}
-                    <button type="submit">Guardar Excursión</button>
-                </form>
-            )}
-            <div>
-                {excursions.map(excursion => (
-                    <div key={excursion.id} style={{ border: "1px solid #ccc", padding: "10px", marginBottom: "10px", backgroundColor: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center", width: "400px" }}>
-                        <div>
-                            {editExcursionId === excursion.id ? (
-                                <form onSubmit={handleUpdateExcursion} style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
-                                    {Object.keys(editExcursion).map((key) => (
-                                        <input key={key} type="text" name={key} placeholder={key.charAt(0).toUpperCase() + key.slice(1)} value={editExcursion[key]} onChange={(e) => handleInputChange(e, setEditExcursion)} required style={{ width: "90%", marginBottom: "10px" }} />
-                                    ))}
-                                    <button type="submit">Actualizar</button>
-                                    <button type="button" onClick={() => setEditExcursionId(null)}>Cancelar</button>
-                                </form>
+        <div className="profile d-flex flex-column align-items-center"
+            style={{ backgroundColor: "#fef9c3", padding: "20px", minHeight: "70vh" }}>
+            <div className="d-flex flex-column align-items-center justify-content-center text-custom-green"
+                style={{
+                    maxWidth: "70%",
+                    width: "60%",
+                    backgroundColor: "#f1f6aa",
+                    borderRadius: "15px",
+                    padding: "20px",
+                    border: "3px solid #31470b",
+                    position: "relative"
+                }}>
+                <button
+                    onClick={() => window.location.href = "/"}
+                    style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        backgroundColor: "transparent",
+                        border: "none",
+                        cursor: "pointer",
+                        fontSize: "20px",
+                        color: "#31470b"
+                    }}>✖</button>
+
+                <h2 style={{
+                    position: "absolute",
+                    top: "20px",
+                    left: "20px",
+                    fontSize: "2rem",
+                    color: "#31470b",
+                }}>CONFIGURACIÓN DE PERFIL</h2>
+
+                <hr style={{ width: "100%", borderTop: "3px solid #31470b", marginTop: "40px", marginBottom: "20px" }} />
+
+                <div className="d-flex align-items-center justify-content-center">
+                    <div className="d-flex flex-column" style={{ marginRight: "20px" }}>
+                        <input className="inputs-width input-yellow" style={inputStyle}
+                            name="nombre" value={editedData.nombre} onChange={handleChange} disabled={!isEditing} placeholder="Nombre" />
+                        <input className="inputs-width input-yellow" style={inputStyle}
+                            name="apellido" value={editedData.apellido} onChange={handleChange} disabled={!isEditing} placeholder="Apellido" />
+                        <input className="inputs-width input-yellow" style={inputStyle}
+                            name="email" value={editedData.email} onChange={handleChange} disabled={!isEditing} placeholder="Correo" />
+                        <input className="inputs-width input-yellow" style={inputStyle}
+                            name="telefono" value={editedData.telefono} onChange={handleChange} disabled={!isEditing} placeholder="Teléfono" />
+
+                        <button className="btn button-width btn-hover"
+                            onClick={isEditing ? handleSaveChanges : handleEditToggle} style={buttonStyle}>
+                            {isEditing ? "Guardar Cambios" : "Editar"}
+                        </button>
+                    </div>
+
+                    <div className="d-flex flex-column align-items-center">
+                        <div className="ellipse-6"
+                            style={{
+                                width: "150px",
+                                height: "150px",
+                                borderRadius: "50%",
+                                overflow: "hidden",
+                                backgroundColor: "#31470b",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                            }}>
+                            {editedData.fotoPerfil ? (
+                                <img src={editedData.fotoPerfil} alt="Perfil"
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                             ) : (
-                                <>
-                                    <h3>{excursion.nombre}</h3>
-                                    <p><strong>Descripción:</strong> {excursion.descripcion}</p>
-                                    <p><strong>Fecha:</strong> {excursion.fecha}</p>
-                                    <p><strong>Cupo Máximo:</strong> {excursion.cupoMaximo}</p>
-                                    <p><strong>Dificultad:</strong> {excursion.dificultad}</p>
-                                    <p><strong>Asistencia:</strong> {excursion.asistencia}</p>
-                                    <p><strong>Excursionistas:</strong> {excursion.excursionistas.length}</p>
-                                    <button onClick={() => handleEdit(excursion)}>Editar</button>
-                                    <button onClick={() => handleDelete(excursion.id)} style={{ color: "red", marginLeft: "10px" }}>Eliminar</button>
-                                </>
+                                <i className="fas fa-user"
+                                    style={{ fontSize: "80px", color: "#fef9c3" }} aria-hidden="true"></i>
                             )}
                         </div>
+
+                        <input type="file" accept="image/*" onChange={handleChangePhoto} style={{ display: "none" }} id="fileInput" />
+                        <button className="btn btn-hover button-width"
+                            onClick={() => document.getElementById("fileInput").click()} style={buttonStyle}>
+                            {uploading ? "Subiendo..." : "Cambiar Foto"}
+                        </button>
                     </div>
-                ))}
+                </div>
             </div>
         </div>
     );
 };
 
-export default Manage_Excursions;
+const inputStyle = { backgroundColor: "#a2a87b", borderRadius: "5px", paddingLeft: "10px" };
+const buttonStyle = { backgroundColor: "#31470b", color: "#fef9c3", borderRadius: "5px" };
+
+export default Profile;
