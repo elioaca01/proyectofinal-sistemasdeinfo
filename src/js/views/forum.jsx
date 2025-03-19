@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Context } from '../store/appContext';
 import { db, auth } from '../firebase';
-import { addDoc, collection, getDocs, updateDoc, doc, orderBy, query } from "firebase/firestore";
+import { addDoc, collection, getDocs, updateDoc, doc, orderBy, query, deleteDoc, getDoc } from "firebase/firestore";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -10,6 +10,11 @@ const Forum = () => {
     const [posts, setPosts] = useState([]);
     const [newPost, setNewPost] = useState({ text: '', image: null });
     const [user, setUser] = useState(null);
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [editedText, setEditedText] = useState('');
+
+    // Imagen predeterminada si no hay foto de perfil
+    const defaultProfilePhoto = "https://res.cloudinary.com/do9dtxrvh/image/upload/v1742413057/Untitled_design_1_hvuwau.png";
 
     useEffect(() => {
         const auth = getAuth();
@@ -31,6 +36,33 @@ const Forum = () => {
         };
         loadPosts();
     }, []);
+
+    // Función para obtener el username y la foto de perfil desde Firestore
+    const getUserInfo = async (uid) => {
+        try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                return {
+                    username: userData.username || "Usuario sin nombre",
+                    photo: userData.fotoPerfil || defaultProfilePhoto
+                };
+            } else {
+                console.log("No se encontró el usuario en Firestore.");
+                return {
+                    username: "Usuario sin nombre",
+                    photo: defaultProfilePhoto
+                };
+            }
+        } catch (error) {
+            console.error("Error al obtener los datos del usuario:", error);
+            return {
+                username: "Usuario sin nombre",
+                photo: defaultProfilePhoto
+            };
+        }
+    };
 
     const handlePostSubmit = async () => {
         if (!user) {
@@ -55,11 +87,15 @@ const Forum = () => {
                     });
             }
 
+            const userInfo = await getUserInfo(user.uid); // Obtener username y foto
+
             const newPostData = {
                 text: newPost.text,
                 image: imageUrl,
                 date: currentDate,
-                user: user.displayName || user.email,
+                user: userInfo.username, // Usar username
+                userPhoto: userInfo.photo, // Guardar la foto de perfil
+                userId: user.uid,
                 comments: [],
                 likes: 0,
                 likedBy: []
@@ -95,10 +131,12 @@ const Forum = () => {
 
         const updatedPosts = [...posts];
         const post = updatedPosts[index];
+        const userInfo = await getUserInfo(user.uid); // Obtener username (sin foto para comentarios por ahora)
+
         const newComment = {
             text: comment,
-            user: user.displayName || user.email,
-            userId: user.uid, // Guardamos el ID del usuario para identificar al autor
+            user: userInfo.username, // Usar username
+            userId: user.uid,
             date: new Date().toLocaleString()
         };
         post.comments.push(newComment);
@@ -122,17 +160,14 @@ const Forum = () => {
         const post = updatedPosts[postIndex];
         const comment = post.comments[commentIndex];
 
-        // Verificar si el usuario es el autor del comentario
         if (comment.userId !== user.uid) {
             alert("Solo puedes borrar tus propios comentarios.");
             return;
         }
 
-        // Eliminar el comentario
         post.comments.splice(commentIndex, 1);
         setPosts(updatedPosts);
 
-        // Actualizar en Firestore
         const postRef = doc(db, "posts", post.id);
         await updateDoc(postRef, {
             comments: post.comments
@@ -177,6 +212,70 @@ const Forum = () => {
         });
     };
 
+    const handleDeletePost = async (postId) => {
+        if (!user) {
+            alert("Debes iniciar sesión para borrar una publicación.");
+            return;
+        }
+
+        const post = posts.find(p => p.id === postId);
+        if (!post.userId || post.userId !== user.uid) {
+            alert("Solo puedes borrar tus propias publicaciones.");
+            return;
+        }
+
+        if (window.confirm("¿Estás seguro de que quieres borrar esta publicación?")) {
+            await deleteDoc(doc(db, "posts", postId)).catch(error => {
+                console.error("Error al borrar la publicación en Firestore:", error);
+            });
+
+            setPosts(posts.filter(p => p.id !== postId));
+        }
+    };
+
+    const handleEditPost = (postId, currentText) => {
+        setEditingPostId(postId);
+        setEditedText(currentText);
+    };
+
+    const handleSaveEdit = async (postId) => {
+        if (!user) {
+            alert("Debes iniciar sesión para editar una publicación.");
+            return;
+        }
+
+        const post = posts.find(p => p.id === postId);
+        if (!post.userId || post.userId !== user.uid) {
+            alert("Solo puedes editar tus propias publicaciones.");
+            return;
+        }
+
+        if (editedText.trim() === '') {
+            alert("El texto no puede estar vacío.");
+            return;
+        }
+
+        const updatedPosts = posts.map(p =>
+            p.id === postId ? { ...p, text: editedText } : p
+        );
+        setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            text: editedText
+        }).catch(error => {
+            console.error("Error al actualizar la publicación en Firestore:", error);
+        });
+
+        setEditingPostId(null);
+        setEditedText('');
+    };
+
+    const handleCancelEdit = () => {
+        setEditingPostId(null);
+        setEditedText('');
+    };
+
     return (
         <div style={{ backgroundColor: '#fbfada', minHeight: '100vh', fontFamily: 'Montserrat, sans-serif', padding: '16px', display: 'flex', justifyContent: 'center' }}>
             <div style={{ maxWidth: '900px', width: '100%', display: 'flex' }}>
@@ -209,8 +308,31 @@ const Forum = () => {
                     {posts.map((post, index) => (
                         <div key={index} id={`post-${index}`} style={{ maxWidth: '640px', margin: '16px auto', backgroundColor: '#fbfada', padding: '16px', borderRadius: '8px', border: '2px solid #2e4e1e' }}>
                             {post.image && <img src={post.image} alt="Imagen del post" style={{ borderRadius: '8px', width: '100%' }} />}
-                            <p><strong>{post.user}</strong> publicó:</p>
-                            <p>{post.text}</p>
+                            <p>
+                                <img
+                                    src={post.userPhoto || defaultProfilePhoto} // Mostrar la foto de perfil
+                                    alt="Foto de perfil"
+                                    style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '8px', verticalAlign: 'middle' }}
+                                />
+                                <strong>{post.user}</strong> publicó:
+                            </p>
+                            {editingPostId === post.id ? (
+                                <div>
+                                    <textarea
+                                        value={editedText}
+                                        onChange={(e) => setEditedText(e.target.value)}
+                                        style={{ width: '100%', padding: '8px', marginBottom: '8px' }}
+                                    />
+                                    <button onClick={() => handleSaveEdit(post.id)} style={{ padding: '4px 8px', backgroundColor: '#2e4e1e', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '8px' }}>
+                                        Guardar
+                                    </button>
+                                    <button onClick={handleCancelEdit} style={{ padding: '4px 8px', backgroundColor: '#888', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        Cancelar
+                                    </button>
+                                </div>
+                            ) : (
+                                <p>{post.text}</p>
+                            )}
                             <p style={{ fontSize: '12px', color: '#888' }}>Publicado el: {post.date}</p>
 
                             <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
@@ -221,6 +343,22 @@ const Forum = () => {
                                     📤 Compartir
                                 </button>
                                 <span>🗨 {post.comments.length}</span>
+                                {user && post.userId === user.uid && (
+                                    <>
+                                        <button
+                                            onClick={() => handleEditPost(post.id, post.text)}
+                                            style={{ background: 'none', border: 'none', color: '#2e4e1e', cursor: 'pointer', fontSize: '12px' }}
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeletePost(post.id)}
+                                            style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '12px' }}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </>
+                                )}
                             </div>
 
                             {post.comments.length > 0 && <hr style={{ margin: '8px 0', border: '1px solid #2e4e1e' }} />}

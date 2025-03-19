@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db, auth } from "../firebase"; // Importar Firebase
 import axios from "axios"; // Importar Axios para la subida de imágenes
 import { onAuthStateChanged } from "firebase/auth";
@@ -74,6 +74,23 @@ const Profile = () => {
         }
     };
 
+    const updateUserPhotoInPosts = async (userId, newPhotoUrl) => {
+        try {
+            const postsRef = collection(db, "posts");
+            const q = query(postsRef, where("userId", "==", userId));
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach(async (postDoc) => {
+                const postRef = doc(db, "posts", postDoc.id);
+                await updateDoc(postRef, { userPhoto: newPhotoUrl });
+            });
+
+            console.log("Foto de perfil actualizada en todos los posts.");
+        } catch (error) {
+            console.error("Error al actualizar la foto de perfil en los posts:", error);
+        }
+    };
+
     const handleChangePhoto = async (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -98,6 +115,9 @@ const Profile = () => {
 
                 setUserData((prev) => ({ ...prev, fotoPerfil: imageUrl }));
                 setEditedData((prev) => ({ ...prev, fotoPerfil: imageUrl }));
+
+                // Actualizar la foto de perfil en todos los posts del usuario
+                await updateUserPhotoInPosts(user.uid, imageUrl);
             }
         } catch (error) {
             console.error("Error al subir la imagen:", error);
