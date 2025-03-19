@@ -102,7 +102,7 @@ const Login = () => {
 
             console.log("✅ Usuario autenticado:", user.uid);
 
-            // Obtener la información del usuario en Firestore
+            // Obtener la información del usuario en Firestore usando su UID
             const userDocRef = doc(db, "users", user.uid);
             const userDocSnap = await getDoc(userDocRef);
 
@@ -110,19 +110,19 @@ const Login = () => {
                 const userData = userDocSnap.data();
                 console.log("📌 Datos del usuario en Firestore:", userData);
 
-                // Guardar usuario y rol en el contexto global
+                // Guardar usuario en el contexto global
                 actions.setUser({
                     uid: user.uid,
                     email: user.email,
-                    role: userData.role,
-                    name: userData.name,
-                    lastName: userData.lastName
+                    role: userData.rol, // Asegurar que coincida con Firestore
+                    name: userData.nombre,
+                    lastName: userData.apellido
                 });
 
-                console.log("✅ Usuario guardado en contexto con rol:", userData.role);
+                console.log("✅ Usuario guardado en contexto con rol:", userData.rol);
 
                 // Redirigir según el rol
-                if (userData.role === "Admin") {
+                if (userData.rol === "Admin") {
                     console.log("🚀 Redirigiendo a Admin Dashboard...");
                     navigate("/admin-dashboard");
                 } else {
@@ -145,6 +145,8 @@ const Login = () => {
             }
         }
     };
+
+
 
 
     const handleGoogleLogin = async () => {

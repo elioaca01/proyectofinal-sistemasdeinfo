@@ -1,40 +1,116 @@
 import React, { useState, useEffect, useContext } from 'react';
-//import { auth } from '../firebase'; // Asegúrate de importar auth desde tu archivo de configuración de Firebase
-// import { onAuthStateChanged } from 'firebase/auth';
-import { Context } from '../store/appContext'; // Importa el contexto
+import { Context } from '../store/appContext';
+import { db, auth } from '../firebase';
+import { addDoc, collection, getDocs, updateDoc, doc, orderBy, query, deleteDoc, getDoc } from "firebase/firestore";
+import axios from "axios";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Forum = () => {
-    const { store } = useContext(Context); // Obtén el estado del contexto
+    const { store } = useContext(Context);
     const [posts, setPosts] = useState([]);
     const [newPost, setNewPost] = useState({ text: '', image: null });
-    const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
+    const [user, setUser] = useState(null);
+    const [editingPostId, setEditingPostId] = useState(null);
+    const [editedText, setEditedText] = useState('');
 
-    // Verificar el estado de autenticación del usuario
-    // useEffect(() => {
-    //     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    //         setUser(currentUser); // Actualiza el estado del usuario
-    //     });
+    // Imagen predeterminada si no hay foto de perfil
+    const defaultProfilePhoto = "https://res.cloudinary.com/do9dtxrvh/image/upload/v1742413057/Untitled_design_1_hvuwau.png";
 
-    //     return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
-    // }, []);
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+        });
+        return () => unsubscribe();
+    }, []);
 
-    const handlePostSubmit = () => {
+    useEffect(() => {
+        const loadPosts = async () => {
+            const postsQuery = query(collection(db, "posts"), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(postsQuery);
+            const postsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setPosts(postsData);
+        };
+        loadPosts();
+    }, []);
+
+    // Función para obtener el username y la foto de perfil desde Firestore
+    const getUserInfo = async (uid) => {
+        try {
+            const userDocRef = doc(db, "users", uid);
+            const userDocSnap = await getDoc(userDocRef);
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                return {
+                    username: userData.username || "Usuario sin nombre",
+                    photo: userData.fotoPerfil || defaultProfilePhoto
+                };
+            } else {
+                console.log("No se encontró el usuario en Firestore.");
+                return {
+                    username: "Usuario sin nombre",
+                    photo: defaultProfilePhoto
+                };
+            }
+        } catch (error) {
+            console.error("Error al obtener los datos del usuario:", error);
+            return {
+                username: "Usuario sin nombre",
+                photo: defaultProfilePhoto
+            };
+        }
+    };
+
+    const handlePostSubmit = async () => {
         if (!user) {
-            alert("Debes iniciar sesión para publicar."); // Mensaje de alerta si no hay sesión
+            alert("Debes iniciar sesión para publicar.");
             return;
         }
 
         if (newPost.text || newPost.image) {
             const currentDate = new Date().toLocaleString();
+            let imageUrl = "";
+
+            if (newPost.image) {
+                const formData = new FormData();
+                formData.append("file", newPost.image);
+                formData.append("upload_preset", "mi_preset");
+
+                await axios.post("https://api.cloudinary.com/v1_1/dhlyuaknz/image/upload", formData)
+                    .then(response => {
+                        imageUrl = response.data.secure_url;
+                    }).catch(error => {
+                        console.error("Error al subir la imagen a Cloudinary:", error);
+                    });
+            }
+
+            const userInfo = await getUserInfo(user.uid); // Obtener username y foto
+
             const newPostData = {
-                ...newPost,
+                text: newPost.text,
+                image: imageUrl,
                 date: currentDate,
-                user: user.displayName || user.email, // Mostrar el nombre o email del usuario
+                user: userInfo.username, // Usar username
+                userPhoto: userInfo.photo, // Guardar la foto de perfil
+                userId: user.uid,
                 comments: [],
                 likes: 0,
-                likedBy: [] // Array para almacenar los IDs de los usuarios que han dado like
+                likedBy: []
             };
-            setPosts([newPostData, ...posts]); // Agregar nuevo post al inicio
+
+            await addDoc(collection(db, "posts"), newPostData);
+
+            const postsQuery = query(collection(db, "posts"), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(postsQuery);
+            const postsData = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setPosts(postsData);
+
             setNewPost({ text: '', image: null });
         }
     };
@@ -42,42 +118,91 @@ const Forum = () => {
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                setNewPost({ ...newPost, image: event.target.result });
-            };
-            reader.readAsDataURL(file);
+            setNewPost({ ...newPost, image: file });
         }
     };
 
-    const handleAddComment = (index, comment) => {
+    const handleAddComment = async (index, comment) => {
         if (!user) {
-            alert("Debes iniciar sesión para comentar."); // Mensaje de alerta si no hay sesión
+            alert("Debes iniciar sesión para comentar.");
             return;
         }
         if (comment.trim() === '') return;
-        const updatedPosts = [...posts];
-        updatedPosts[index].comments.push(comment);
-        setPosts(updatedPosts);
-    };
 
-    const handleLike = (index) => {
-        if (!user) {
-            alert("Debes iniciar sesión para dar like."); // Mensaje de alerta si no hay sesión
-            return;
-        }
         const updatedPosts = [...posts];
         const post = updatedPosts[index];
+        const userInfo = await getUserInfo(user.uid); // Obtener username (sin foto para comentarios por ahora)
 
-        // Verificar si el usuario ya ha dado like
-        if (post.likedBy.includes(user.uid)) {
-            alert("Ya has dado like a esta publicación."); // Mensaje si ya ha dado like
+        const newComment = {
+            text: comment,
+            user: userInfo.username, // Usar username
+            userId: user.uid,
+            date: new Date().toLocaleString()
+        };
+        post.comments.push(newComment);
+        setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            comments: post.comments
+        }).catch(error => {
+            console.error("Error al actualizar los comentarios en Firestore:", error);
+        });
+    };
+
+    const handleDeleteComment = async (postIndex, commentIndex) => {
+        if (!user) {
+            alert("Debes iniciar sesión para borrar un comentario.");
             return;
         }
 
-        post.likes += 1; // Incrementar el contador de likes
-        post.likedBy.push(user.uid); // Agregar el ID del usuario al array de usuarios que han dado like
+        const updatedPosts = [...posts];
+        const post = updatedPosts[postIndex];
+        const comment = post.comments[commentIndex];
+
+        if (comment.userId !== user.uid) {
+            alert("Solo puedes borrar tus propios comentarios.");
+            return;
+        }
+
+        post.comments.splice(commentIndex, 1);
         setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            comments: post.comments
+        }).catch(error => {
+            console.error("Error al borrar el comentario en Firestore:", error);
+        });
+    };
+
+    const handleLike = async (index) => {
+        if (!user) {
+            alert("Debes iniciar sesión para dar like.");
+            return;
+        }
+
+        const updatedPosts = [...posts];
+        const post = updatedPosts[index];
+        const userLiked = post.likedBy.includes(user.uid);
+
+        if (userLiked) {
+            post.likes -= 1;
+            post.likedBy = post.likedBy.filter(uid => uid !== user.uid);
+        } else {
+            post.likes += 1;
+            post.likedBy.push(user.uid);
+        }
+
+        setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            likes: post.likes,
+            likedBy: post.likedBy
+        }).catch(error => {
+            console.error("Error al actualizar los likes en Firestore:", error);
+        });
     };
 
     const handleShare = (index) => {
@@ -85,6 +210,70 @@ const Forum = () => {
         navigator.clipboard.writeText(postUrl).then(() => {
             alert("¡Enlace copiado al portapapeles!");
         });
+    };
+
+    const handleDeletePost = async (postId) => {
+        if (!user) {
+            alert("Debes iniciar sesión para borrar una publicación.");
+            return;
+        }
+
+        const post = posts.find(p => p.id === postId);
+        if (!post.userId || post.userId !== user.uid) {
+            alert("Solo puedes borrar tus propias publicaciones.");
+            return;
+        }
+
+        if (window.confirm("¿Estás seguro de que quieres borrar esta publicación?")) {
+            await deleteDoc(doc(db, "posts", postId)).catch(error => {
+                console.error("Error al borrar la publicación en Firestore:", error);
+            });
+
+            setPosts(posts.filter(p => p.id !== postId));
+        }
+    };
+
+    const handleEditPost = (postId, currentText) => {
+        setEditingPostId(postId);
+        setEditedText(currentText);
+    };
+
+    const handleSaveEdit = async (postId) => {
+        if (!user) {
+            alert("Debes iniciar sesión para editar una publicación.");
+            return;
+        }
+
+        const post = posts.find(p => p.id === postId);
+        if (!post.userId || post.userId !== user.uid) {
+            alert("Solo puedes editar tus propias publicaciones.");
+            return;
+        }
+
+        if (editedText.trim() === '') {
+            alert("El texto no puede estar vacío.");
+            return;
+        }
+
+        const updatedPosts = posts.map(p =>
+            p.id === postId ? { ...p, text: editedText } : p
+        );
+        setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            text: editedText
+        }).catch(error => {
+            console.error("Error al actualizar la publicación en Firestore:", error);
+        });
+
+        setEditingPostId(null);
+        setEditedText('');
+    };
+
+    const handleCancelEdit = () => {
+        setEditingPostId(null);
+        setEditedText('');
     };
 
     return (
@@ -112,15 +301,38 @@ const Forum = () => {
                             onChange={(e) => setNewPost({ ...newPost, text: e.target.value })}
                             style={{ width: '100%', padding: '8px', marginBottom: '8px' }}
                         />
-                        {newPost.image && <img src={newPost.image} alt="Vista previa" style={{ borderRadius: '8px', width: '100%' }} />}
+                        {newPost.image && <img src={URL.createObjectURL(newPost.image)} alt="Vista previa" style={{ borderRadius: '8px', width: '100%' }} />}
                         <button onClick={handlePostSubmit} style={{ padding: '8px 16px', backgroundColor: '#2e4e1e', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Publicar</button>
                     </div>
 
                     {posts.map((post, index) => (
                         <div key={index} id={`post-${index}`} style={{ maxWidth: '640px', margin: '16px auto', backgroundColor: '#fbfada', padding: '16px', borderRadius: '8px', border: '2px solid #2e4e1e' }}>
                             {post.image && <img src={post.image} alt="Imagen del post" style={{ borderRadius: '8px', width: '100%' }} />}
-                            <p><strong>{post.user}</strong> publicó:</p>
-                            <p>{post.text}</p>
+                            <p>
+                                <img
+                                    src={post.userPhoto || defaultProfilePhoto} // Mostrar la foto de perfil
+                                    alt="Foto de perfil"
+                                    style={{ width: '30px', height: '30px', borderRadius: '50%', marginRight: '8px', verticalAlign: 'middle' }}
+                                />
+                                <strong>{post.user}</strong> publicó:
+                            </p>
+                            {editingPostId === post.id ? (
+                                <div>
+                                    <textarea
+                                        value={editedText}
+                                        onChange={(e) => setEditedText(e.target.value)}
+                                        style={{ width: '100%', padding: '8px', marginBottom: '8px' }}
+                                    />
+                                    <button onClick={() => handleSaveEdit(post.id)} style={{ padding: '4px 8px', backgroundColor: '#2e4e1e', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '8px' }}>
+                                        Guardar
+                                    </button>
+                                    <button onClick={handleCancelEdit} style={{ padding: '4px 8px', backgroundColor: '#888', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                                        Cancelar
+                                    </button>
+                                </div>
+                            ) : (
+                                <p>{post.text}</p>
+                            )}
                             <p style={{ fontSize: '12px', color: '#888' }}>Publicado el: {post.date}</p>
 
                             <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
@@ -131,13 +343,41 @@ const Forum = () => {
                                     📤 Compartir
                                 </button>
                                 <span>🗨 {post.comments.length}</span>
+                                {user && post.userId === user.uid && (
+                                    <>
+                                        <button
+                                            onClick={() => handleEditPost(post.id, post.text)}
+                                            style={{ background: 'none', border: 'none', color: '#2e4e1e', cursor: 'pointer', fontSize: '12px' }}
+                                        >
+                                            Editar
+                                        </button>
+                                        <button
+                                            onClick={() => handleDeletePost(post.id)}
+                                            style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '12px' }}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </>
+                                )}
                             </div>
 
                             {post.comments.length > 0 && <hr style={{ margin: '8px 0', border: '1px solid #2e4e1e' }} />}
 
                             <div style={{ marginTop: '8px' }}>
                                 {post.comments.map((comment, idx) => (
-                                    <div key={idx} style={{ fontSize: '14px', color: '#666' }}>🗨 {comment}</div>
+                                    <div key={idx} style={{ fontSize: '14px', color: '#666', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span>
+                                            🗨 <strong>{comment.user}</strong>: {comment.text} <span style={{ fontSize: '12px' }}>({comment.date})</span>
+                                        </span>
+                                        {user && comment.userId === user.uid && (
+                                            <button
+                                                onClick={() => handleDeleteComment(index, idx)}
+                                                style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '12px' }}
+                                            >
+                                                Eliminar
+                                            </button>
+                                        )}
+                                    </div>
                                 ))}
                                 <textarea
                                     placeholder="Agrega un comentario..."

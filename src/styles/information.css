@@ -13,17 +13,17 @@
 }
 
 
-/*Esquema para letras en tipografía Beba Neus (TITULOS) en verde*/
+/*Esquema para letras en tipografía Beba Neus (TITULOS) en amarillo*/
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 .text-custom-green {
     color: #31470b;
-    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
-}
-/*Esquema para letras en tipografía Beba Neus (TITULOS) en amarillo*/
+    font-family: 'Bebas Neue', sans-serif; } /* Añadir la nueva tipografía 
+
+/Esquema para letras en tipografía Beba Neus (TITULOS) en amarillo*/
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
 .text-custom-green2 {
     color: #fef9c3;
-    font-family: 'Bebas Neue', sans-serif; /* Añadir la nueva tipografía */
+    font-family: 'Bebas Neue', sans-serif; /*Añadir la nueva tipografía*/
 }
 
 /*Esquema para letras en tipografía Montserrat en verde y amarillo*/
