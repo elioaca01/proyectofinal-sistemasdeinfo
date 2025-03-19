@@ -1,30 +1,28 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Context } from '../store/appContext'; // Importa el contexto
-import { db, auth } from '../firebase'; // Asegúrate de que Firebase esté bien configurado
-import { addDoc, collection, getDocs } from "firebase/firestore";
-import axios from "axios"; // Necesitamos Axios para hacer la petición a Cloudinary
-import { getAuth, onAuthStateChanged } from "firebase/auth"; // Importa correctamente `onAuthStateChanged` de Firebase
+import { Context } from '../store/appContext';
+import { db, auth } from '../firebase';
+import { addDoc, collection, getDocs, updateDoc, doc, orderBy, query } from "firebase/firestore";
+import axios from "axios";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 const Forum = () => {
-    const { store } = useContext(Context); // Obtén el estado del contexto
+    const { store } = useContext(Context);
     const [posts, setPosts] = useState([]);
     const [newPost, setNewPost] = useState({ text: '', image: null });
-    const [user, setUser] = useState(null); // Estado para almacenar el usuario autenticado
+    const [user, setUser] = useState(null);
 
-    // Verificar el estado de autenticación del usuario
     useEffect(() => {
-        const auth = getAuth(); // Obtener la instancia de Firebase Auth
+        const auth = getAuth();
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setUser(currentUser); // Actualiza el estado del usuario
+            setUser(currentUser);
         });
-
-        return () => unsubscribe(); // Limpiar el suscriptor al desmontar el componente
+        return () => unsubscribe();
     }, []);
 
-    // Cargar las publicaciones desde Firestore cuando se monta el componente
     useEffect(() => {
         const loadPosts = async () => {
-            const querySnapshot = await getDocs(collection(db, "posts"));
+            const postsQuery = query(collection(db, "posts"), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(postsQuery);
             const postsData = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
@@ -44,16 +42,14 @@ const Forum = () => {
             const currentDate = new Date().toLocaleString();
             let imageUrl = "";
 
-            // Si hay una imagen, subirla a Cloudinary
             if (newPost.image) {
                 const formData = new FormData();
                 formData.append("file", newPost.image);
-                formData.append("upload_preset", "mi_preset"); // Reemplaza con tu preset de Cloudinary
+                formData.append("upload_preset", "mi_preset");
 
-                // Subir la imagen a Cloudinary
                 await axios.post("https://api.cloudinary.com/v1_1/dhlyuaknz/image/upload", formData)
                     .then(response => {
-                        imageUrl = response.data.secure_url; // Obtener la URL de la imagen subida
+                        imageUrl = response.data.secure_url;
                     }).catch(error => {
                         console.error("Error al subir la imagen a Cloudinary:", error);
                     });
@@ -61,64 +57,117 @@ const Forum = () => {
 
             const newPostData = {
                 text: newPost.text,
-                image: imageUrl, // Guardamos la URL de la imagen de Cloudinary
+                image: imageUrl,
                 date: currentDate,
-                user: user.displayName || user.email, // Mostrar el nombre o email del usuario
+                user: user.displayName || user.email,
                 comments: [],
                 likes: 0,
-                likedBy: [] // Array para almacenar los IDs de los usuarios que han dado like
+                likedBy: []
             };
 
-            // Guardar el post en Firestore
             await addDoc(collection(db, "posts"), newPostData);
 
-            // Luego de agregar el nuevo post, recargar los posts para que se muestren
-            const querySnapshot = await getDocs(collection(db, "posts"));
+            const postsQuery = query(collection(db, "posts"), orderBy("date", "desc"));
+            const querySnapshot = await getDocs(postsQuery);
             const postsData = querySnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
             setPosts(postsData);
 
-            setNewPost({ text: '', image: null }); // Resetear el post
+            setNewPost({ text: '', image: null });
         }
     };
 
     const handleImageUpload = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setNewPost({ ...newPost, image: file }); // Guardar el archivo en el estado
+            setNewPost({ ...newPost, image: file });
         }
     };
 
-    const handleAddComment = (index, comment) => {
+    const handleAddComment = async (index, comment) => {
         if (!user) {
             alert("Debes iniciar sesión para comentar.");
             return;
         }
         if (comment.trim() === '') return;
+
         const updatedPosts = [...posts];
-        updatedPosts[index].comments.push(comment);
+        const post = updatedPosts[index];
+        const newComment = {
+            text: comment,
+            user: user.displayName || user.email,
+            userId: user.uid, // Guardamos el ID del usuario para identificar al autor
+            date: new Date().toLocaleString()
+        };
+        post.comments.push(newComment);
         setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            comments: post.comments
+        }).catch(error => {
+            console.error("Error al actualizar los comentarios en Firestore:", error);
+        });
     };
 
-    const handleLike = (index) => {
+    const handleDeleteComment = async (postIndex, commentIndex) => {
+        if (!user) {
+            alert("Debes iniciar sesión para borrar un comentario.");
+            return;
+        }
+
+        const updatedPosts = [...posts];
+        const post = updatedPosts[postIndex];
+        const comment = post.comments[commentIndex];
+
+        // Verificar si el usuario es el autor del comentario
+        if (comment.userId !== user.uid) {
+            alert("Solo puedes borrar tus propios comentarios.");
+            return;
+        }
+
+        // Eliminar el comentario
+        post.comments.splice(commentIndex, 1);
+        setPosts(updatedPosts);
+
+        // Actualizar en Firestore
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            comments: post.comments
+        }).catch(error => {
+            console.error("Error al borrar el comentario en Firestore:", error);
+        });
+    };
+
+    const handleLike = async (index) => {
         if (!user) {
             alert("Debes iniciar sesión para dar like.");
             return;
         }
+
         const updatedPosts = [...posts];
         const post = updatedPosts[index];
+        const userLiked = post.likedBy.includes(user.uid);
 
-        // Verificar si el usuario ya ha dado like
-        if (post.likedBy.includes(user.uid)) {
-            alert("Ya has dado like a esta publicación.");
-            return;
+        if (userLiked) {
+            post.likes -= 1;
+            post.likedBy = post.likedBy.filter(uid => uid !== user.uid);
+        } else {
+            post.likes += 1;
+            post.likedBy.push(user.uid);
         }
 
-        post.likes += 1;
-        post.likedBy.push(user.uid);
         setPosts(updatedPosts);
+
+        const postRef = doc(db, "posts", post.id);
+        await updateDoc(postRef, {
+            likes: post.likes,
+            likedBy: post.likedBy
+        }).catch(error => {
+            console.error("Error al actualizar los likes en Firestore:", error);
+        });
     };
 
     const handleShare = (index) => {
@@ -178,7 +227,19 @@ const Forum = () => {
 
                             <div style={{ marginTop: '8px' }}>
                                 {post.comments.map((comment, idx) => (
-                                    <div key={idx} style={{ fontSize: '14px', color: '#666' }}>🗨 {comment}</div>
+                                    <div key={idx} style={{ fontSize: '14px', color: '#666', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <span>
+                                            🗨 <strong>{comment.user}</strong>: {comment.text} <span style={{ fontSize: '12px' }}>({comment.date})</span>
+                                        </span>
+                                        {user && comment.userId === user.uid && (
+                                            <button
+                                                onClick={() => handleDeleteComment(index, idx)}
+                                                style={{ background: 'none', border: 'none', color: '#ff4444', cursor: 'pointer', fontSize: '12px' }}
+                                            >
+                                                Eliminar
+                                            </button>
+                                        )}
+                                    </div>
                                 ))}
                                 <textarea
                                     placeholder="Agrega un comentario..."
