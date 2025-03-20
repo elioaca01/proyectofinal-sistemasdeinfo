@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -6,12 +6,12 @@ import {
     signInWithEmailAndPassword,
     GoogleAuthProvider,
     FacebookAuthProvider,
-    signInWithPopup
+    signInWithPopup,
+    sendPasswordResetEmail // Importar para restablecer contraseñas
 } from "firebase/auth";
 import { auth, db } from "../firebase.js";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import "../../styles/login.css";
-
 const Login = () => {
     const { actions } = useContext(Context);
     const navigate = useNavigate();
@@ -209,6 +209,27 @@ const Login = () => {
         }
     };
 
+    const [isResettingPassword, setIsResettingPassword] = useState(false); // Agregar este estado
+    const [resetPasswordEmail, setResetPasswordEmail] = useState(""); // Agregar el estado para el correo del reset
+
+    const handleResetPassword = async (e) => {
+        e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+        if (!resetPasswordEmail) {
+            setError("Por favor, ingrese un correo.");
+            return;
+        }
+
+        try {
+            await sendPasswordResetEmail(auth, resetPasswordEmail);
+            setError("Te hemos enviado un correo para restablecer tu contraseña.");
+            setIsResettingPassword(false); // Cerrar el formulario de restablecimiento
+        } catch (error) {
+            console.error("🚨 Error al restablecer la contraseña:", error.message);
+            setError("Error al restablecer la contraseña.");
+        }
+    };
+
+
     return (
         <div className="w-100 bg-custom-yellow">
             {/* Bienvenida e imagen */}
@@ -270,7 +291,38 @@ const Login = () => {
                             </nav>
 
                             <div className="tab-content mt-2" id="nav-tabContent">
-                                {isLogin && (
+                                {isResettingPassword && (
+                                    <div>
+                                        <form onSubmit={handleResetPassword} className="d-flex flex-column align-items-center">
+                                            <input
+                                                className="form-control form-control-lg inputs-width borde-input text-custom-paragraph2 placeholder-custom input-yellow"
+                                                type="email"
+                                                placeholder="Introduce tu correo"
+                                                value={resetPasswordEmail}
+                                                onChange={(e) => setResetPasswordEmail(e.target.value)}
+                                            />
+                                            {error && <p className="text-danger">{error}</p>}
+
+                                            <button
+                                                className="btn bg-custom-green button-width mt-3 text-custom-green2 placeholder-custom btn-hover"
+                                                type="submit"
+                                                style={{ fontSize: '1.2rem' }}
+                                            >
+                                                Restablecer Contraseña
+                                            </button>
+
+                                            <button
+                                                className="btn btn-link"
+                                                style={{ textDecoration: 'none', color: '#007bff', marginTop: '10px' }}
+                                                onClick={() => setIsResettingPassword(false)} // Volver al inicio de sesión
+                                            >
+                                                Volver al inicio de sesión
+                                            </button>
+                                        </form>
+                                    </div>
+                                )}
+
+                                {!isResettingPassword && isLogin && (
                                     <div>
                                         <form onSubmit={handleLogin} className="d-flex flex-column align-items-center">
                                             <input
@@ -328,11 +380,23 @@ const Login = () => {
                                                 </div>
                                             </div>
                                         </form>
+
+                                        {/* Enlace para restablecer la contraseña */}
+                                        <div className="text-center mt-3">
+                                            <button
+                                                className="btn btn-link"
+                                                style={{ textDecoration: 'none', color: '#007bff' }}
+                                                onClick={() => setIsResettingPassword(true)} // Cambiar el estado para mostrar el formulario de restablecimiento
+                                            >
+                                                ¿Olvidaste tu contraseña?
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 
+
                                 {/* Validación, input, correo y contraseña - registro */}
-                                {!isLogin && (
+                                {!isLogin && !isResettingPassword && (
                                     <div className="tab-pane fade show active" id="nav-profile">
                                         <form onSubmit={handleRegister} className="d-flex flex-column align-items-center">
                                             <input
@@ -439,6 +503,7 @@ const Login = () => {
             </div>
         </div>
     );
+
 };
 
 export default Login;

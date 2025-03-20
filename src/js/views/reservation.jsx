@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"; // Reintegrado
 import { db, auth } from "../../js/firebase.js";
-import { collection, addDoc, query, where, getDocs, doc, setDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
 const Reservation = () => {
@@ -13,19 +13,18 @@ const Reservation = () => {
         numeroPersonas: 1, // Valor inicial de 1 persona
         fecha: "",
         ruta: "",
-        guiaUid: "",
+        guiaId: "",
     });
 
     const [pagoExitoso, setPagoExitoso] = useState(false);
-    const [paypalReady, setPaypalReady] = useState(false);
     const [precioTotal, setPrecioTotal] = useState(1);
     const [montoPersonalizado, setMontoPersonalizado] = useState(1);
     const [excursiones, setExcursiones] = useState([]);
     const [excursionSeleccionada, setExcursionSeleccionada] = useState(null);
     const [usuario, setUsuario] = useState(null);
+    const [destinos, setDestinos] = useState([]); // Nuevo estado para los destinos
 
     useEffect(() => {
-        setPaypalReady(true);
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 setUsuario(user); // Usuario autenticado
@@ -43,6 +42,24 @@ const Reservation = () => {
         setMontoPersonalizado(montoMinimo);
     }, [reserva.numeroPersonas]);
 
+    // Cargar los destinos desde Firestore
+    useEffect(() => {
+        const fetchDestinations = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "destinations"));
+                const availableDestinations = querySnapshot.docs.map(doc => ({
+                    ...doc.data(),
+                }));
+                setDestinos(availableDestinations);
+                console.log("Destinations loaded:", availableDestinations);
+            } catch (error) {
+                console.error("Error al obtener los destinos:", error);
+            }
+        };
+
+        fetchDestinations();
+    }, []);
+
     const handleChange = async (e) => {
         const { name, value } = e.target;
         setReserva({ ...reserva, [name]: value });
@@ -57,7 +74,9 @@ const Reservation = () => {
         try {
             const q = query(collection(db, "excursions"), where("nombre", "==", rutaSeleccionada));
             const querySnapshot = await getDocs(q);
-            const resultados = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            const resultados = querySnapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(excursion => !excursion.reservadoPor); // Filtra las excursiones donde "reservadoPor" está vacío
             setExcursiones(resultados);
         } catch (error) {
             console.error("Error al buscar excursiones:", error);
@@ -66,12 +85,17 @@ const Reservation = () => {
 
     const handleSeleccionarExcursion = (excursion) => {
         setExcursionSeleccionada(excursion);
-        setReserva({ ...reserva, ruta: excursion.nombre, guiaUid: excursion.guiaUid, fecha: excursion.fecha });
+        setReserva({
+            ...reserva,
+            ruta: excursion.nombre,
+            guiaId: excursion.guiaId,
+            fecha: excursion.fecha
+        });
     };
 
     const handleCancelarSeleccion = () => {
         setExcursionSeleccionada(null);
-        setReserva({ ...reserva, ruta: "", guiaUid: "", fecha: "" });
+        setReserva({ ...reserva, ruta: "", guiaId: "", fecha: "" });
     };
 
     const handleReserva = async () => {
@@ -81,18 +105,47 @@ const Reservation = () => {
                 return;
             }
 
+            // Verificación de campos
+            if (!reserva.guiaId) {
+                throw new Error("El campo guía no puede estar vacío.");
+            }
+
             const reservaData = {
-                nombre: usuario.displayName, // Nombre del usuario autenticado
-                email: usuario.email,        // Correo del usuario
-                telefono: usuario.phoneNumber, // Teléfono del usuario
-                numeroPersonas: reserva.numeroPersonas,
-                ruta: reserva.ruta,
-                fecha: reserva.fecha,
-                guiaUid: reserva.guiaUid,
+                nombre: usuario.displayName || "",
+                email: usuario.email || "",
+                telefono: usuario.phoneNumber || "",
+                numeroPersonas: reserva.numeroPersonas || 1,
+                ruta: reserva.ruta || "",
+                fecha: reserva.fecha || "",
+                guiaId: reserva.guiaId,
                 pagoExitoso: pagoExitoso,
             };
 
-            await addDoc(collection(db, "reservas"), reservaData);
+            // Asegúrate de que todos los campos estén definidos antes de enviar
+            for (let key in reservaData) {
+                if (reservaData[key] === undefined || reservaData[key] === null || reservaData[key] === "") {
+                    if (key !== "telefono") {
+                        throw new Error(`El campo ${key} no puede ser nulo, indefinido o vacío`);
+                    }
+                }
+            }
+
+            console.log("Datos de reserva:", reservaData); // Verifica los datos
+
+            // Crear el ID de la reserva manualmente (con un UUID o cualquier otro método)
+            const idReserva = new Date().getTime().toString(); // Usamos el timestamp como un ID único
+
+            // Agregar la reserva en Firestore
+            const reservaDocRef = await addDoc(collection(db, "reservas"), { ...reservaData, idReserva });
+
+            // Ahora actualizamos la excursión seleccionada con el idReserva
+            if (excursionSeleccionada) {
+                const excursionRef = doc(db, "excursions", excursionSeleccionada.id);
+                await updateDoc(excursionRef, {
+                    reservadoPor: idReserva // Agregar el id de la reserva a la excursión
+                });
+            }
+
             alert("Reserva realizada con éxito.");
 
             setReserva({
@@ -100,15 +153,21 @@ const Reservation = () => {
                 apellido: "",
                 email: "",
                 telefono: "",
-                numeroPersonas: 1, // Reiniciar a 1 persona
+                numeroPersonas: 1,
                 fecha: "",
                 ruta: "",
-                guiaUid: "",
+                guiaId: "",
             });
 
         } catch (error) {
             console.error("Error al realizar la reserva:", error);
+            alert("Hubo un error al realizar la reserva: " + error.message);
         }
+    };
+
+    const handlePagoExitoso = (details) => {
+        setPagoExitoso(true);
+        alert("¡Pago realizado con éxito!");
     };
 
     return (
@@ -126,12 +185,9 @@ const Reservation = () => {
                             onChange={handleChange}
                             required>
                             <option value="">Seleccione una ruta</option>
-                            <option value="Sabas Nieve">Sabas Nieve</option>
-                            <option value="Lagunazo">Lagunazo</option>
-                            <option value="El Banquito, Lagunazo y Pico">El Banquito, Lagunazo y Pico</option>
-                            <option value="Pico Naiguiata">Pico Naiguiata</option>
-                            <option value="Cruz de los palmeros y Pico Oriental">Cruz de los palmeros y Pico Oriental</option>
-                            <option value="Piedra del indio Via Quebrada Quintero">Piedra del indio Via Quebrada Quintero</option>
+                            {destinos.map((destino, index) => (
+                                <option key={index} value={destino.nombre}>{destino.nombre}</option>
+                            ))}
                         </select>
                     </div>
                 </div>
@@ -191,21 +247,29 @@ const Reservation = () => {
                                     min={precioTotal} step="0.01" />
                             </div>
 
-                            {paypalReady && (
-                                <PayPalScriptProvider options={{ "client-id": "AbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
-                                    <PayPalButtons
-                                        createOrder={(data, actions) => actions.order.create({
-                                            purchase_units: [{ amount: { value: montoPersonalizado.toFixed(2) } }]
-                                        })}
-                                        onApprove={(data, actions) => actions.order.capture().then(() => setPagoExitoso(true))}
-                                    />
-                                </PayPalScriptProvider>
-                            )}
+                            {/* PayPal Integration */}
+                            <PayPalScriptProvider options={{ "client-id": "AbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
+                                <PayPalButtons
+                                    style={{ layout: "vertical" }}
+                                    createOrder={(data, actions) => {
+                                        return actions.order.create({
+                                            purchase_units: [
+                                                {
+                                                    amount: {
+                                                        value: montoPersonalizado.toFixed(2), // Monto mínimo
+                                                    },
+                                                },
+                                            ],
+                                        });
+                                    }}
+                                    onApprove={handlePagoExitoso}
+                                />
+                            </PayPalScriptProvider>
 
-                            {excursionSeleccionada && (
+                            {pagoExitoso && excursionSeleccionada && (
                                 <button type="button" className="btn text-white w-100 mt-3"
                                     style={{ backgroundColor: "#045c2c", borderRadius: "10px", fontSize: "18px" }}
-                                    disabled={!pagoExitoso} onClick={handleReserva}>
+                                    onClick={handleReserva}>
                                     Reservar
                                 </button>
                             )}

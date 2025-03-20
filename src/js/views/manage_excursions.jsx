@@ -15,7 +15,8 @@ const ManageExcursions = () => {
         fecha: "",
         dificultad: "",
         destinoId: "",
-        guiaId: ""
+        guiaId: "",
+        reservadoPor: "" // Ahora guardaremos el ID de la reserva aquí
     });
 
     const [editExcursion, setEditExcursion] = useState(null);
@@ -66,7 +67,7 @@ const ManageExcursions = () => {
         }
 
         await addDoc(collection(db, "excursions"), newExcursion);
-        setNewExcursion({ nombre: "", descripcion: "", fecha: "", dificultad: "", destinoId: "", guiaId: "" });
+        setNewExcursion({ nombre: "", descripcion: "", fecha: "", dificultad: "", destinoId: "", guiaId: "", reservadoPor: "" });
 
         setShowAddForm(false);
         fetchExcursions();
@@ -103,6 +104,18 @@ const ManageExcursions = () => {
             alert("Excursión actualizada correctamente.");
         } catch (error) {
             console.error("Error al actualizar la excursión:", error);
+        }
+    };
+
+    // Función para manejar la reserva de una excursión
+    const handleReserveExcursion = async (excursionId, reservaId) => {
+        try {
+            const excursionRef = doc(db, "excursions", excursionId);
+            await updateDoc(excursionRef, { reservadoPor: reservaId }); // Guardamos el ID de la reserva en lugar del ID del usuario
+            fetchExcursions(); // Refrescar la lista de excursiones después de la reserva
+            alert("Excursión reservada con éxito.");
+        } catch (error) {
+            console.error("Error al reservar la excursión:", error);
         }
     };
 
@@ -149,6 +162,12 @@ const ManageExcursions = () => {
                         <p><strong>Descripción:</strong> {excursion.descripcion}</p>
                         <p><strong>Fecha:</strong> {excursion.fecha}</p>
                         <p><strong>Guía:</strong> {guides.find(g => g.id === excursion.guiaId)?.nombre || "No asignado"}</p>
+                        <p><strong>Estado:</strong> {excursion.reservadoPor ? `Reservada, ID Reserva: ${excursion.reservadoPor}` : "No reservada"}</p>
+                        {!excursion.reservadoPor && (
+                            <button onClick={() => handleReserveExcursion(excursion.id, "ID_DE_LA_RESERVA")} style={{ backgroundColor: "#007bff", color: "white" }}>
+                                Reservar
+                            </button>
+                        )}
                         <button onClick={() => handleEdit(excursion)}>Editar</button>
                         <button onClick={() => handleDelete(excursion.id)} style={{ color: "red" }}>Eliminar</button>
                     </div>
