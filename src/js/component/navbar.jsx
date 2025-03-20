@@ -28,7 +28,6 @@ export const Navbar = () => {
 				setProfilePhoto(null); // No mostrar foto si no hay usuario
 				setUserRole("Excursionista"); // Reiniciar rol
 			}
-			console.log("Estado del usuario:", currentUser); // Añadido para verificar el estado de usuario
 		});
 
 		return () => unsubscribe(); // Limpiar el listener al desmontar el componente
@@ -57,6 +56,7 @@ export const Navbar = () => {
 	};
 
 	const isAdmin = user && userRole === "Admin";
+	const isGuide = user && userRole === "Guía";
 
 	const handleLogout = () => {
 		logout();
@@ -108,6 +108,12 @@ export const Navbar = () => {
 					{isAdmin && (
 						<Link to="/management" className="text-custom-paragraph text-decoration-none link-hover">
 							Gestionar
+						</Link>
+					)}
+
+					{isGuide && (
+						<Link to="/management_g" className="text-custom-paragraph text-decoration-none link-hover">
+							Excursiones
 						</Link>
 					)}
 
