@@ -124,7 +124,7 @@ const Login = () => {
                 // Redirigir según el rol
                 if (userData.rol === "Admin") {
                     console.log("🚀 Redirigiendo a Admin Dashboard...");
-                    navigate("/admin-dashboard");
+                    navigate("/");
                 } else {
                     console.log("🏠 Redirigiendo a Home...");
                     navigate("/");
@@ -186,7 +186,7 @@ const Login = () => {
 
             // Redirigir según el rol del usuario
             if (userData.role === "Admin") {
-                navigate("/admin-dashboard");
+                navigate("/");
             } else {
                 navigate("/");
             }
