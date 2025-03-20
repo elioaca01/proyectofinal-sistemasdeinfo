@@ -19,6 +19,7 @@ import injectContext from "./store/appContext.jsx";
 
 import { Navbar } from "./component/navbar.jsx";
 import { Footer } from "./component/footer.jsx";
+import ManageReservations from "./views/manage_reservations.jsx";
 
 
 //create your first component
@@ -48,6 +49,7 @@ const Layout = () => {
 						<Route path="/manage_excursions" element={<Manage_Excursions />} />
 						<Route path="/manage_routes" element={<Manage_Routes />} />
 						<Route path="/adddestination" element={<AddDestination />} />
+						<Route path="/manage_reservations" element={<ManageReservations />} />
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />
