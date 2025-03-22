@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import "../../styles/destination.css";
 
 const ManageExcursions = () => {
     const [excursions, setExcursions] = useState([]);
-    const [filteredExcursions, setFilteredExcursions] = useState([]);
     const [destinations, setDestinations] = useState([]);
     const [guides, setGuides] = useState([]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [editExcursionId, setEditExcursionId] = useState(null);
+    const [filterStatus, setFilterStatus] = useState("todos"); // Estado para el filtro
 
     const [newExcursion, setNewExcursion] = useState({
         nombre: "",
@@ -18,21 +17,16 @@ const ManageExcursions = () => {
         dificultad: "",
         destinoId: "",
         guiaId: "",
-        reservadoPor: ""
+        reservadoPor: "" // Inicialmente vacío
     });
 
     const [editExcursion, setEditExcursion] = useState(null);
-    const [filterStatus, setFilterStatus] = useState('todos'); // Para filtrar entre todas, reservadas o no reservadas
 
     useEffect(() => {
         fetchExcursions();
         fetchDestinations();
         fetchGuides();
     }, []);
-
-    useEffect(() => {
-        filterExcursions(filterStatus);
-    }, [excursions, filterStatus]);
 
     // Cargar excursiones desde Firebase
     const fetchExcursions = async () => {
@@ -73,7 +67,13 @@ const ManageExcursions = () => {
             return;
         }
 
-        await addDoc(collection(db, "excursions"), newExcursion);
+        // Crear la excursión con el campo reservadoPor vacío
+        await addDoc(collection(db, "excursions"), {
+            ...newExcursion,
+            reservadoPor: "" // Asegurarse de que esté vacío
+        });
+
+        // Reiniciar el formulario
         setNewExcursion({ nombre: "", descripcion: "", fecha: "", dificultad: "", destinoId: "", guiaId: "", reservadoPor: "" });
 
         setShowAddForm(false);
@@ -95,7 +95,7 @@ const ManageExcursions = () => {
     const handleEdit = (excursion) => {
         setEditExcursion({ ...excursion });
         setEditExcursionId(excursion.id);
-        setShowAddForm(true);
+        setShowAddForm(false);
     };
 
     const handleUpdateExcursion = async (e) => {
@@ -114,28 +114,12 @@ const ManageExcursions = () => {
         }
     };
 
-    // Función para filtrar las excursiones según su estado de reserva
-    const filterExcursions = (status) => {
-        let filtered = [...excursions];
-        if (status === "reservada") {
-            filtered = excursions.filter(excursion => excursion.reservadoPor);
-        } else if (status === "noReservada") {
-            filtered = excursions.filter(excursion => !excursion.reservadoPor);
-        }
-        setFilteredExcursions(filtered);
-    };
-
-    const handleDestinationChange = (e) => {
-        const selectedDestinationId = e.target.value;
-        const selectedDestination = destinations.find(dest => dest.id === selectedDestinationId);
-
-        setEditExcursion(prev => ({
-            ...prev,
-            destinoId: selectedDestinationId,
-            nombre: selectedDestination ? selectedDestination.nombre : "",
-            descripcion: selectedDestination ? selectedDestination.descripcion : "",
-        }));
-    };
+    // Filtrar excursiones según el estado
+    const filteredExcursions = excursions.filter(excursion => {
+        if (filterStatus === "reservada") return excursion.reservadoPor;
+        if (filterStatus === "noReservada") return !excursion.reservadoPor;
+        return true; // "todos"
+    });
 
     return (
         <div style={{ width: "100%", backgroundColor: "#fef9c3", padding: "30px", textAlign: "center" }}>
@@ -217,7 +201,7 @@ const ManageExcursions = () => {
                 </div>
 
                 {showAddForm && (
-                    <form onSubmit={handleUpdateExcursion}
+                    <form onSubmit={handleAddExcursion}
                         style={{
                             marginTop: "20px",
                             backgroundColor: "#fff",
@@ -227,12 +211,16 @@ const ManageExcursions = () => {
                             maxWidth: "400px",
                             margin: "auto",
                         }}>
-                        <input type="date" name="fecha" value={editExcursion.fecha} onChange={(e) => handleInputChange(e, setEditExcursion)} required
+                        <input type="text" name="nombre" placeholder="Nombre de la ruta" value={newExcursion.nombre} onChange={(e) => handleInputChange(e, setNewExcursion)} required
                             style={{ marginBottom: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ddd", width: "100%" }} />
-                        <input type="text" name="dificultad" placeholder="Dificultad" value={editExcursion.dificultad} onChange={(e) => handleInputChange(e, setEditExcursion)}
+                        <textarea name="descripcion" placeholder="Descripción de la ruta" value={newExcursion.descripcion} onChange={(e) => handleInputChange(e, setNewExcursion)}
+                            style={{ marginBottom: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ddd", width: "100%" }} />
+                        <input type="date" name="fecha" value={newExcursion.fecha} onChange={(e) => handleInputChange(e, setNewExcursion)} required
+                            style={{ marginBottom: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ddd", width: "100%" }} />
+                        <input type="text" name="dificultad" placeholder="Dificultad" value={newExcursion.dificultad} onChange={(e) => handleInputChange(e, setNewExcursion)}
                             style={{ marginBottom: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ddd", width: "100%" }} />
 
-                        <select name="destinoId" value={editExcursion.destinoId} onChange={handleDestinationChange} required
+                        <select name="destinoId" value={newExcursion.destinoId} onChange={(e) => handleInputChange(e, setNewExcursion)} required
                             style={{ marginBottom: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ddd", width: "100%" }}>
                             <option value="">Seleccione un destino</option>
                             {destinations.map(destino => (
@@ -240,7 +228,7 @@ const ManageExcursions = () => {
                             ))}
                         </select>
 
-                        <select name="guiaId" value={editExcursion.guiaId} onChange={(e) => handleInputChange(e, setEditExcursion)} required
+                        <select name="guiaId" value={newExcursion.guiaId} onChange={(e) => handleInputChange(e, setNewExcursion)} required
                             style={{ marginBottom: "10px", padding: "10px", borderRadius: "5px", border: "1px solid #ddd", width: "100%" }}>
                             <option value="">Seleccione un guía</option>
                             {guides.map(guia => (
@@ -267,4 +255,3 @@ const ManageExcursions = () => {
 };
 
 export default ManageExcursions;
-

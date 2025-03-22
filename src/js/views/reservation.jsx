@@ -16,7 +16,6 @@ const Reservation = () => {
         guiaId: "",
     });
 
-    const [pagoExitoso, setPagoExitoso] = useState(false);
     const [precioTotal, setPrecioTotal] = useState(1);
     const [montoPersonalizado, setMontoPersonalizado] = useState(1);
     const [excursiones, setExcursiones] = useState([]);
@@ -118,14 +117,14 @@ const Reservation = () => {
                 ruta: reserva.ruta || "",
                 fecha: reserva.fecha || "",
                 guiaId: reserva.guiaId,
-                pagoExitoso: pagoExitoso,
+                pagoExitoso: true, // Cambiado: se hace la reserva sin necesidad de pago exitoso
             };
 
             // Asegúrate de que todos los campos estén definidos antes de enviar
             for (let key in reservaData) {
                 if (reservaData[key] === undefined || reservaData[key] === null || reservaData[key] === "") {
                     if (key !== "telefono") {
-                        throw new Error(`El campo ${key} no puede ser nulo, indefinido o vacío`);
+                        throw new Error(`El campo ${key} no puede estar nulo, indefinido o vacío`);
                     }
                 }
             }
@@ -166,7 +165,6 @@ const Reservation = () => {
     };
 
     const handlePagoExitoso = (details) => {
-        setPagoExitoso(true);
         alert("¡Pago realizado con éxito!");
     };
 
@@ -266,13 +264,11 @@ const Reservation = () => {
                                 />
                             </PayPalScriptProvider>
 
-                            {pagoExitoso && excursionSeleccionada && (
-                                <button type="button" className="btn text-white w-100 mt-3"
-                                    style={{ backgroundColor: "#045c2c", borderRadius: "10px", fontSize: "18px" }}
-                                    onClick={handleReserva}>
-                                    Reservar
-                                </button>
-                            )}
+                            <button type="button" className="btn text-white w-100 mt-3"
+                                style={{ backgroundColor: "#045c2c", borderRadius: "10px", fontSize: "18px" }}
+                                onClick={handleReserva}>
+                                Reservar
+                            </button>
                         </form>
                     </div>
                 </div>
