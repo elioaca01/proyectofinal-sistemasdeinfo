@@ -15,6 +15,10 @@ import Manage_Guides from "./views/manage_guides.jsx";
 import Manage_Excursions from "./views/manage_excursions.jsx";
 import AddDestination from "./views/adddestination.jsx";
 import Manage_Routes from "./views/manage_routes.jsx";
+import Management_G from "./views/management_g.jsx";
+import Manage_Active_Excursions from "./views/manage_active_excursions.jsx";
+import Manage_Completed_Excursions from "./views/manage_completed_excursions.jsx";
+
 import injectContext from "./store/appContext.jsx";
 
 import { Navbar } from "./component/navbar.jsx";
@@ -48,6 +52,9 @@ const Layout = () => {
 						<Route path="/manage_excursions" element={<Manage_Excursions />} />
 						<Route path="/manage_routes" element={<Manage_Routes />} />
 						<Route path="/adddestination" element={<AddDestination />} />
+						<Route path="/management_g" element={<Management_G />} />
+						<Route path="/manage_active_excursions" element={<Manage_Active_Excursions />} />
+						<Route path="/manage_completed_excursions" element={<Manage_Completed_Excursions />} />
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />

@@ -1,6 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Gallery = () => {
+
+  const navigate = useNavigate();
+  const goToForum = () => navigate("/forum");
+
   return (
     <div className="bg-light p-0" style={{ maxWidth: '100vw', overflowX: 'hidden' }}>
       {/* Header Image */}
@@ -24,7 +29,8 @@ const Gallery = () => {
           <span className="fw-bold"> #ViveTuAventura</span> en
           <span className="fw-bold"> @AventuraWeb</span> para tener la oportunidad de aparecer en la lista.
         </p>
-        <button className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-lg">
+        <button className="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-lg"
+          onClick={goToForum}>
           Agregar mi experiencia
         </button>
       </div>

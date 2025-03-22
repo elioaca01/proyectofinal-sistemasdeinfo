@@ -56,6 +56,7 @@ export const Navbar = () => {
 	};
 
 	const isAdmin = user && userRole === "Admin";
+	const isGuide = user && userRole === "Guía";
 
 	const handleLogout = () => {
 		logout();
@@ -107,6 +108,12 @@ export const Navbar = () => {
 					{isAdmin && (
 						<Link to="/management" className="text-custom-paragraph text-decoration-none link-hover">
 							Gestionar
+						</Link>
+					)}
+
+					{isGuide && (
+						<Link to="/management_g" className="text-custom-paragraph text-decoration-none link-hover">
+							Excursiones
 						</Link>
 					)}
 
