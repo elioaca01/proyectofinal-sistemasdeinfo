@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../auth.js";
-
+import "../../styles/destination.css";
 const Management = () => {
   const navigate = useNavigate();
 
@@ -18,74 +18,89 @@ const Management = () => {
   };
 
   return (
-    <div className="d-flex flex-column align-items-center my-4" style={{ width: "100%" }}>
-      <p className
+    <div className="d-flex flex-column align-items-center" style={{ backgroundColor: "#fef9c3", padding: "50px" }}>
+      <p className="display-4 fw-bold text-custom-green"
         style={{
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: "20px",
-          color: "#000",
+          fontSize: "3rem",
           lineHeight: "1.6",
           textAlign: "justify",
         }}>
         Selecciona una de las opciones a gestionar:
       </p>
-      <button
-        className="btn btn-primary mb-3"
-        style={{
-          backgroundColor: "#09490e",
-          border: "2px solid #09490e",
-          color: "#fbfada",
-          padding: "10px 20px",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: "20px",
-          fontWeight: "bold",
-          letterSpacing: "1px"
-        }}
-        onClick={goToManageGuides}
-      >
-        Guías
-      </button>
+      <div style={{ backgroundColor: "#31470b", padding: "20px", borderRadius: "10px", display: "inline-block" }}>
+        <button
+          className="btn btn-primary mb-3"
+          style={{
+            backgroundColor: "#fef9c3",
+            border: "2px solid #31470b",
+            color: "#31470b",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: "20px",
+            fontWeight: "bold",
+            letterSpacing: "1px",
+            transition: "background-color 0.3s, transform 0.3s",
+            marginBottom: "10px"
+          }}
+          onClick={goToManageGuides}
+          onMouseEnter={(e) => e.target.style.backgroundColor = "#e0e0a3"}
+          onMouseLeave={(e) => e.target.style.backgroundColor = "#fef9c3"}
+        >
+          Guías
+        </button>
 
-      <button
-        className="btn btn-secondary mb-3"
-        style={{
-          backgroundColor: "#09490e",
-          border: "2px solid #09490e",
-          color: "#fbfada",
-          padding: "10px 20px",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: "20px",
-          fontWeight: "bold",
-          letterSpacing: "1px"
-        }}
-        onClick={goToManageExcursions}
-      >
-        Excursiones
-      </button>
+        <button
+          className="btn btn-secondary mb-3"
+          style={{
+            backgroundColor: "#fef9c3",
+            border: "2px solid #31470b",
+            color: "#31470b",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: "20px",
+            fontWeight: "bold",
+            letterSpacing: "1px",
+            transition: "background-color 0.3s, transform 0.3s",
+            marginBottom: "10px",
+             marginLeft: "10px"
+          }}
+          onClick={goToManageExcursions}
+          onMouseEnter={(e) => e.target.style.backgroundColor = "#e0e0a3"}
+          onMouseLeave={(e) => e.target.style.backgroundColor = "#fef9c3"}
+        >
+          Excursiones
+        </button>
 
-      <button
-        className="btn btn-third"
-        style={{
-          backgroundColor: "#09490e",
-          border: "2px solid #09490e",
-          color: "#fbfada",
-          padding: "10px 20px",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: "20px",
-          fontWeight: "bold",
-          letterSpacing: "1px"
-        }}
-        onClick={goToManageRoutes}
-      >
-        Destinos
-      </button>
+        <button
+          className="btn btn-third"
+          style={{
+            backgroundColor: "#fef9c3",
+            border: "2px solid #31470b",
+            color: "#31470b",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            cursor: "pointer",
+            fontFamily: "'Montserrat', sans-serif",
+            fontSize: "20px",
+            fontWeight: "bold",
+            letterSpacing: "1px",
+            transition: "background-color 0.3s, transform 0.3s",
+            marginBottom: "10px",
+            marginLeft: "10px"
+          }}
+          onClick={goToManageRoutes}
+          onMouseEnter={(e) => e.target.style.backgroundColor = "#e0e0a3"}
+          onMouseLeave={(e) => e.target.style.backgroundColor = "#fef9c3"}
+        >
+          Destinos
+        </button>
+      </div>
     </div>
   );
 }
+
 export default Management;

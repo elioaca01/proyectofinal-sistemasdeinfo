@@ -23,6 +23,7 @@ import injectContext from "./store/appContext.jsx";
 
 import { Navbar } from "./component/navbar.jsx";
 import { Footer } from "./component/footer.jsx";
+import ManageReservations from "./views/manage_reservations.jsx";
 
 
 //create your first component

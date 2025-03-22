@@ -66,8 +66,11 @@ const ManageRoutes = () => {
     };
 
     return (
-        <div className="container mt-4">
-            <h2 className="text-center mb-4">Gestionar Destinos</h2>
+        <div style={{ backgroundColor: "#fef9c3", minHeight: "100vh", padding: "20px" }}>
+            <div className="container mt-4">
+                <h2 className="display-4 fw-bold text-custom-green"
+                    style={{ fontSize: "3rem", letterSpacing: '2px'}}
+                >Gestionar Destinos</h2>
 
             {/* Modo edición */}
             {editingDestination ? (
@@ -180,6 +183,7 @@ const ManageRoutes = () => {
                     ))
                 )
             )}
+        </div>
         </div>
     );
 };
