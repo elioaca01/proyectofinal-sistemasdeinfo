@@ -121,7 +121,7 @@ export const Navbar = () => {
 					<Link to="/forum" className="text-custom-paragraph text-decoration-none link-hover">
 						Foro
 					</Link>
-					<Link to="/info" className="text-custom-paragraph text-decoration-none link-hover">
+					<Link to="/information" className="text-custom-paragraph text-decoration-none link-hover">
 						Información
 					</Link>
 					<Link to="/gallery" className="text-custom-paragraph text-decoration-none link-hover">

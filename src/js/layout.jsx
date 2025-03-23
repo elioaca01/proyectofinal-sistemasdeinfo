@@ -18,12 +18,12 @@ import Manage_Routes from "./views/manage_routes.jsx";
 import Management_G from "./views/management_g.jsx";
 import Manage_Active_Excursions from "./views/manage_active_excursions.jsx";
 import Manage_Completed_Excursions from "./views/manage_completed_excursions.jsx";
+import ManageReservations from "./views/manage_reservations.jsx";
 
 import injectContext from "./store/appContext.jsx";
 
 import { Navbar } from "./component/navbar.jsx";
 import { Footer } from "./component/footer.jsx";
-import ManageReservations from "./views/manage_reservations.jsx";
 
 
 //create your first component
@@ -45,7 +45,7 @@ const Layout = () => {
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/reservation" element={<Reservation />} />
 						<Route path="/destination" element={<Destination />} />
-						<Route path="/info" element={<Information />} />
+						<Route path="/information" element={<Information />} />
 						<Route path="/forum" element={<Forum />} />
 						<Route path="/gallery" element={<Gallery />} />
 						<Route path="/management" element={<Management />} />
@@ -56,6 +56,7 @@ const Layout = () => {
 						<Route path="/management_g" element={<Management_G />} />
 						<Route path="/manage_active_excursions" element={<Manage_Active_Excursions />} />
 						<Route path="/manage_completed_excursions" element={<Manage_Completed_Excursions />} />
+						<Route path="/manage_reservations" element={<ManageReservations />} />
 						<Route path="*" element={<h1>Not found!</h1>} />
 					</Routes>
 					<Footer />

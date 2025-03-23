@@ -5,3 +5,20 @@
 .text-white{
     color:white
 }
+
+.react-calendar__month-view__days__day .react-calendar__tile.highlight-date {
+    background-color: #045c2c !important;
+    color: white !important;
+    border-radius: 50% !important;
+}
+
+.react-calendar__month-view__days__day--weekend {
+    color: inherit !important;
+}
+
+.react-calendar {
+    width: 100%;
+    max-width: 350px;
+    font-size: 14px;
+    margin: 0 auto;
+}

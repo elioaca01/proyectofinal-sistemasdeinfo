@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js"; // Reintegrado
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { db, auth } from "../../js/firebase.js";
 import { collection, addDoc, query, where, getDocs, updateDoc, doc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 const Reservation = () => {
     const [reserva, setReserva] = useState({
@@ -10,7 +12,7 @@ const Reservation = () => {
         apellido: "",
         email: "",
         telefono: "",
-        numeroPersonas: 1, // Valor inicial de 1 persona
+        numeroPersonas: 1,
         fecha: "",
         ruta: "",
         guiaId: "",
@@ -21,27 +23,28 @@ const Reservation = () => {
     const [excursiones, setExcursiones] = useState([]);
     const [excursionSeleccionada, setExcursionSeleccionada] = useState(null);
     const [usuario, setUsuario] = useState(null);
-    const [destinos, setDestinos] = useState([]); // Nuevo estado para los destinos
+    const [destinos, setDestinos] = useState([]);
+    const [excursionDates, setExcursionDates] = useState([]);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
-                setUsuario(user); // Usuario autenticado
+                setUsuario(user);
                 setReserva({ ...reserva, email: user.email, telefono: user.phoneNumber });
             }
         });
 
-        return () => unsubscribe(); // Limpiar el listener
+        return () => unsubscribe();
     }, [reserva.email]);
 
     useEffect(() => {
         const numPersonas = reserva.numeroPersonas ? parseInt(reserva.numeroPersonas, 10) || 1 : 1;
-        const montoMinimo = numPersonas * 1; // El monto mínimo es $1 por persona
+        const montoMinimo = numPersonas * 1;
         setPrecioTotal(montoMinimo);
         setMontoPersonalizado(montoMinimo);
     }, [reserva.numeroPersonas]);
 
-    // Cargar los destinos desde Firestore
     useEffect(() => {
         const fetchDestinations = async () => {
             try {
@@ -53,11 +56,63 @@ const Reservation = () => {
                 console.log("Destinations loaded:", availableDestinations);
             } catch (error) {
                 console.error("Error al obtener los destinos:", error);
+                setError("No se pudieron cargar los destinos.");
             }
         };
 
         fetchDestinations();
     }, []);
+
+    useEffect(() => {
+        const fetchExcursionsForRoute = async () => {
+            if (reserva.ruta) {
+                try {
+                    console.log("Buscando excursiones para la ruta:", reserva.ruta);
+                    const q = query(collection(db, "excursions"), where("nombre", "==", reserva.ruta));
+                    const querySnapshot = await getDocs(q);
+                    console.log("Número de excursiones encontradas:", querySnapshot.docs.length);
+                    const dates = querySnapshot.docs.map(doc => {
+                        const fecha = doc.data().fecha;
+                        console.log("ID del documento:", doc.id);
+                        console.log("Fecha cruda de Firebase:", fecha);
+                        let parsedDate;
+                        if (typeof fecha === 'string') {
+                            // Parsear el formato "YYYY-MM-DD"
+                            parsedDate = new Date(fecha);
+                        } else if (fecha instanceof Date) {
+                            parsedDate = fecha;
+                        } else if (fecha && fecha.toDate) { // Timestamp de Firebase
+                            parsedDate = fecha.toDate();
+                        } else {
+                            console.error("Formato de fecha no reconocido:", fecha);
+                            return null;
+                        }
+                        if (isNaN(parsedDate.getTime())) {
+                            console.error("Fecha inválida después de parsear:", fecha);
+                            return null;
+                        }
+                        // Normalizar la fecha para evitar problemas de zona horaria
+                        const normalizedDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+                        return {
+                            id: doc.id,
+                            fecha: normalizedDate
+                        };
+                    }).filter(date => date !== null);
+                    setExcursionDates(dates);
+                    console.log("Fechas procesadas (YYYY-MM-DD):", dates.map(d => d.fecha.toISOString().split('T')[0]));
+                } catch (error) {
+                    console.error("Error al cargar excursiones:", error);
+                    setError("No se pudieron cargar las fechas de las excursiones.");
+                    setExcursionDates([]);
+                }
+            } else {
+                setExcursionDates([]);
+                setError(null);
+            }
+        };
+
+        fetchExcursionsForRoute();
+    }, [reserva.ruta]);
 
     const handleChange = async (e) => {
         const { name, value } = e.target;
@@ -75,10 +130,12 @@ const Reservation = () => {
             const querySnapshot = await getDocs(q);
             const resultados = querySnapshot.docs
                 .map(doc => ({ id: doc.id, ...doc.data() }))
-                .filter(excursion => !excursion.reservadoPor); // Filtra las excursiones donde "reservadoPor" está vacío
+                .filter(excursion => !excursion.reservadoPor);
             setExcursiones(resultados);
+            console.log("Excursiones disponibles encontradas:", resultados);
         } catch (error) {
             console.error("Error al buscar excursiones:", error);
+            setError("No se pudieron cargar las excursiones disponibles.");
         }
     };
 
@@ -104,7 +161,6 @@ const Reservation = () => {
                 return;
             }
 
-            // Verificación de campos
             if (!reserva.guiaId) {
                 throw new Error("El campo guía no puede estar vacío.");
             }
@@ -117,10 +173,9 @@ const Reservation = () => {
                 ruta: reserva.ruta || "",
                 fecha: reserva.fecha || "",
                 guiaId: reserva.guiaId,
-                pagoExitoso: true, // Cambiado: se hace la reserva sin necesidad de pago exitoso
+                pagoExitoso: true,
             };
 
-            // Asegúrate de que todos los campos estén definidos antes de enviar
             for (let key in reservaData) {
                 if (reservaData[key] === undefined || reservaData[key] === null || reservaData[key] === "") {
                     if (key !== "telefono") {
@@ -129,19 +184,15 @@ const Reservation = () => {
                 }
             }
 
-            console.log("Datos de reserva:", reservaData); // Verifica los datos
+            console.log("Datos de reserva:", reservaData);
 
-            // Crear el ID de la reserva manualmente (con un UUID o cualquier otro método)
-            const idReserva = new Date().getTime().toString(); // Usamos el timestamp como un ID único
-
-            // Agregar la reserva en Firestore
+            const idReserva = new Date().getTime().toString();
             const reservaDocRef = await addDoc(collection(db, "reservas"), { ...reservaData, idReserva });
 
-            // Ahora actualizamos la excursión seleccionada con el idReserva
             if (excursionSeleccionada) {
                 const excursionRef = doc(db, "excursions", excursionSeleccionada.id);
                 await updateDoc(excursionRef, {
-                    reservadoPor: idReserva // Agregar el id de la reserva a la excursión
+                    reservadoPor: idReserva
                 });
             }
 
@@ -167,6 +218,36 @@ const Reservation = () => {
     const handlePagoExitoso = (details) => {
         alert("¡Pago realizado con éxito!");
     };
+
+    const tileClassName = ({ date, view }) => {
+        if (view === 'month') {
+            // Normalizar la fecha del calendario a YYYY-MM-DD
+            const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+            const normalizedDateStr = `${normalizedDate.getFullYear()}-${String(normalizedDate.getMonth() + 1).padStart(2, '0')}-${String(normalizedDate.getDate()).padStart(2, '0')}`;
+
+            // Normalizar las fechas de excursiones a YYYY-MM-DD
+            const normalizedExcursionDates = excursionDates.map(exc => {
+                const d = new Date(exc.fecha.getFullYear(), exc.fecha.getMonth(), exc.fecha.getDate());
+                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+            });
+
+            console.log("Fecha del calendario (YYYY-MM-DD):", normalizedDateStr);
+            console.log("Fechas de excursiones (YYYY-MM-DD):", normalizedExcursionDates);
+            const isHighlighted = normalizedExcursionDates.includes(normalizedDateStr);
+            console.log("¿Fecha resaltada?:", isHighlighted);
+            return isHighlighted ? 'highlight-date' : null;
+        }
+    };
+
+    if (error) {
+        return (
+            <div className="container my-5 text-center">
+                <h1 className="text-danger">Error</h1>
+                <p>{error}</p>
+                <p>Por favor, revisa la consola para más detalles.</p>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -221,6 +302,21 @@ const Reservation = () => {
                     </div>
                 )}
 
+                {reserva.ruta && (
+                    <div className="row mt-5 justify-content-center">
+                        <div className="col-md-6 text-center">
+                            <h2 className="mb-4" style={{ color: "#045c2c", fontWeight: "bold" }}>
+                                Disponibilidad para {reserva.ruta}
+                            </h2>
+                            <Calendar
+                                tileClassName={tileClassName}
+                                className="mx-auto"
+                                key={reserva.ruta} // Forzar re-renderizado al cambiar la ruta
+                            />
+                        </div>
+                    </div>
+                )}
+
                 <div className="row mt-5 justify-content-center">
                     <div className="col-12 col-md-4 mb-5 p-4 border rounded shadow bg-light">
                         <form>
@@ -245,7 +341,6 @@ const Reservation = () => {
                                     min={precioTotal} step="0.01" />
                             </div>
 
-                            {/* PayPal Integration */}
                             <PayPalScriptProvider options={{ "client-id": "AbB7-32DDP6ODkkI8EX_YARuWejKXP9ANCbQjpGK5KTXpzcRTPxgpIcCqNekvKHyFj7Jge8B5nyD88vF" }}>
                                 <PayPalButtons
                                     style={{ layout: "vertical" }}
@@ -254,7 +349,7 @@ const Reservation = () => {
                                             purchase_units: [
                                                 {
                                                     amount: {
-                                                        value: montoPersonalizado.toFixed(2), // Monto mínimo
+                                                        value: montoPersonalizado.toFixed(2),
                                                     },
                                                 },
                                             ],
