@@ -91,15 +91,15 @@ const Reservation = () => {
                             console.error("Fecha inválida después de parsear:", fecha);
                             return null;
                         }
-                        // Normalizar la fecha para evitar problemas de zona horaria
-                        const normalizedDate = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate());
+                        // Guardar la fecha como string en formato "YYYY-MM-DD" para comparación
+                        const dateStr = `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, '0')}-${String(parsedDate.getDate()).padStart(2, '0')}`;
                         return {
                             id: doc.id,
-                            fecha: normalizedDate
+                            fecha: dateStr // Almacenar como string
                         };
                     }).filter(date => date !== null);
                     setExcursionDates(dates);
-                    console.log("Fechas procesadas (YYYY-MM-DD):", dates.map(d => d.fecha.toISOString().split('T')[0]));
+                    console.log("Fechas procesadas para el calendario:", dates);
                 } catch (error) {
                     console.error("Error al cargar excursiones:", error);
                     setError("No se pudieron cargar las fechas de las excursiones.");
@@ -221,19 +221,15 @@ const Reservation = () => {
 
     const tileClassName = ({ date, view }) => {
         if (view === 'month') {
-            // Normalizar la fecha del calendario a YYYY-MM-DD
-            const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-            const normalizedDateStr = `${normalizedDate.getFullYear()}-${String(normalizedDate.getMonth() + 1).padStart(2, '0')}-${String(normalizedDate.getDate()).padStart(2, '0')}`;
+            // Normalizar la fecha del calendario a "YYYY-MM-DD"
+            const normalizedDateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-            // Normalizar las fechas de excursiones a YYYY-MM-DD
-            const normalizedExcursionDates = excursionDates.map(exc => {
-                const d = new Date(exc.fecha.getFullYear(), exc.fecha.getMonth(), exc.fecha.getDate());
-                return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-            });
+            // Obtener las fechas de excursiones como strings
+            const excursionDateStrings = excursionDates.map(exc => exc.fecha);
 
             console.log("Fecha del calendario (YYYY-MM-DD):", normalizedDateStr);
-            console.log("Fechas de excursiones (YYYY-MM-DD):", normalizedExcursionDates);
-            const isHighlighted = normalizedExcursionDates.includes(normalizedDateStr);
+            console.log("Fechas de excursiones (YYYY-MM-DD):", excursionDateStrings);
+            const isHighlighted = excursionDateStrings.includes(normalizedDateStr);
             console.log("¿Fecha resaltada?:", isHighlighted);
             return isHighlighted ? 'highlight-date' : null;
         }
@@ -311,7 +307,7 @@ const Reservation = () => {
                             <Calendar
                                 tileClassName={tileClassName}
                                 className="mx-auto"
-                                key={reserva.ruta} // Forzar re-renderizado al cambiar la ruta
+                                key={reserva.ruta} // Forzar re-renderizado
                             />
                         </div>
                     </div>

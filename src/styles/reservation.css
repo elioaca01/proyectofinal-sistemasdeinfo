@@ -6,16 +6,19 @@
     color:white
 }
 
-.react-calendar__month-view__days__day .react-calendar__tile.highlight-date {
-    background-color: #045c2c !important;
-    color: white !important;
-    border-radius: 50% !important;
+/* Simplificar y aumentar especificidad */
+.highlight-date {
+    border: 2px solid #045c2c !important; /* Recuadro verde oscuro */
+    border-radius: 5px !important; /* Redondear el borde */
+    background-color: transparent !important; /* Fondo transparente */
 }
 
+/* Desactivar el resaltado por defecto de fines de semana */
 .react-calendar__month-view__days__day--weekend {
     color: inherit !important;
 }
 
+/* Estilos generales del calendario */
 .react-calendar {
     width: 100%;
     max-width: 350px;
